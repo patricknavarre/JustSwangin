@@ -14,6 +14,10 @@ export function MobileNav() {
   const swing = path === "/swing";
   const batLab = path === "/bat-lab" || path === "/bat-analyze";
   const scorecard = path === "/scorecard";
+  const betting = path === "/betting-tracker";
+  const clubAverages = path === "/club-averages";
+  const strokesGained = path === "/strokes-gained";
+  const moreActive = betting || clubAverages || strokesGained || results;
 
   return (
     <nav
@@ -96,19 +100,68 @@ export function MobileNav() {
           Bat Lab
         </Link>
 
-        <Link
-          href="/analyze"
-          className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
-            results ? "text-[var(--text)]" : "text-[var(--section-label)]"
-          }`}
-        >
-          <NavIcon>
-            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </NavIcon>
-          Results
-        </Link>
+        <div className="relative">
+          <details className="group">
+            <summary
+              className={`flex cursor-pointer min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
+                moreActive ? "text-[var(--text)]" : "text-[var(--section-label)]"
+              }`}
+            >
+              <NavIcon>
+                <svg
+                  className="h-7 w-7"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </NavIcon>
+              More
+            </summary>
+            <div className="absolute bottom-[4.25rem] right-0 w-56 rounded-2xl border border-black/[0.08] bg-white p-2 shadow-card">
+              <div className="flex flex-col gap-1">
+                <Link
+                  href="/analyze"
+                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
+                    results ? "text-[var(--accent)]" : "text-[var(--text)]"
+                  }`}
+                >
+                  Results
+                </Link>
+                <Link
+                  href="/betting-tracker"
+                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
+                    betting ? "text-[var(--accent)]" : "text-[var(--text)]"
+                  }`}
+                >
+                  Betting Tracker
+                </Link>
+                <Link
+                  href="/club-averages"
+                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
+                    clubAverages ? "text-[var(--accent)]" : "text-[var(--text)]"
+                  }`}
+                >
+                  Club Averages
+                </Link>
+                <Link
+                  href="/strokes-gained"
+                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
+                    strokesGained ? "text-[var(--accent)]" : "text-[var(--text)]"
+                  }`}
+                >
+                  Strokes Gained
+                </Link>
+              </div>
+            </div>
+          </details>
+        </div>
       </div>
     </nav>
   );

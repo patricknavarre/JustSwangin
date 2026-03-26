@@ -95,6 +95,38 @@ export default function Home() {
       </div>
 
       <div className="card">
+        <h2 className="section-heading">Priority Features</h2>
+        <p className="font-display mt-2 text-2xl text-[var(--text)]">
+          Build your friend-group favorites
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+          Three utility pages made for weekends: betting, club distances from TrackMan data, and a
+          lightweight strokes gained calculator.
+        </p>
+
+        <div className="mt-5 space-y-3">
+          <Link
+            href="/betting-tracker"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open Betting Tracker
+          </Link>
+          <Link
+            href="/club-averages"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open Club Averages
+          </Link>
+          <Link
+            href="/strokes-gained"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open Strokes Gained
+          </Link>
+        </div>
+      </div>
+
+      <div className="card">
         <h2 className="section-heading">Digital scorecard</h2>
         <p className="font-display mt-2 text-2xl text-[var(--text)]">
           Track live rounds and review previous scores
