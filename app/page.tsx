@@ -51,6 +51,31 @@ export default function Home() {
       </section>
 
       <div className="card">
+        <h2 className="section-heading">Privacy note</h2>
+        <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+          Pose landmark processing happens on-device in the browser. The app sends your computed
+          metrics (and optional launch-monitor CSV averages) to Claude to generate the coaching
+          report.
+        </p>
+      </div>
+
+      <div className="card">
+        <h2 className="section-heading">Next step</h2>
+        <p className="font-display mt-2 text-2xl text-[var(--text)]">Let’s map your swing.</p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+          Upload a clip that clearly shows your full body, choose camera angle, and run analysis.
+        </p>
+        <div className="mt-5">
+          <Link
+            href="/swing"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Go to Swing
+          </Link>
+        </div>
+      </div>
+
+      <div className="card">
         <h2 className="section-heading">Digital scorecard</h2>
         <p className="font-display mt-2 text-2xl text-[var(--text)]">
           Track live rounds and review previous scores
@@ -73,31 +98,6 @@ export default function Home() {
             className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
           >
             Open scorecard
-          </Link>
-        </div>
-      </div>
-
-      <div className="card">
-        <h2 className="section-heading">Privacy note</h2>
-        <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-          Pose landmark processing happens on-device in the browser. The app sends your computed
-          metrics (and optional launch-monitor CSV averages) to Claude to generate the coaching
-          report.
-        </p>
-      </div>
-
-      <div className="card">
-        <h2 className="section-heading">Next step</h2>
-        <p className="font-display mt-2 text-2xl text-[var(--text)]">Let’s map your swing.</p>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
-          Upload a clip that clearly shows your full body, choose camera angle, and run analysis.
-        </p>
-        <div className="mt-5">
-          <Link
-            href="/swing"
-            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
-          >
-            Go to Swing
           </Link>
         </div>
       </div>
