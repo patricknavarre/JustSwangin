@@ -48,7 +48,7 @@ export function MobileNav() {
           Scorecard
         </Link>
 
-        <div className="relative -top-5 flex flex-col items-center">
+        <div className="relative flex flex-col items-center">
           <Link
             href="/swing"
             className={`flex h-[56px] w-[56px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-fab transition active:scale-95 active:opacity-90 ${
@@ -66,7 +66,7 @@ export function MobileNav() {
               <circle cx="12" cy="8" r="3.25" fill="currentColor" stroke="none" />
             </svg>
           </Link>
-          <span className="mt-1 text-[11px] font-semibold text-[var(--section-label)]">Swing</span>
+          <span className="mt-2 text-[11px] font-semibold text-[var(--section-label)]">Swing</span>
         </div>
 
         <Link
