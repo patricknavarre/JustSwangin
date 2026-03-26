@@ -69,25 +69,47 @@ async function fetchOverpassNearby(
   radiusMeters: number,
 ): Promise<NearbyCourseSuggestion[]> {
   const query = `[out:json][timeout:15];(node[\"leisure\"=\"golf_course\"](around:${radiusMeters},${lat},${lng});way[\"leisure\"=\"golf_course\"](around:${radiusMeters},${lat},${lng});relation[\"leisure\"=\"golf_course\"](around:${radiusMeters},${lat},${lng}););out center tags;`;
+  const endpoints = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://lz4.overpass-api.de/api/interpreter",
+  ];
 
-  const response = await fetch("https://overpass-api.de/api/interpreter", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-      "User-Agent": "JustSwangin/1.0 (scorecard-nearby)",
-    },
-    body: `data=${encodeURIComponent(query)}`,
-    cache: "no-store",
-  });
+  let lastError: string | null = null;
+  let list: NearbyCourseSuggestion[] = [];
 
-  if (!response.ok) {
-    throw new Error(`Overpass API error: ${response.status}`);
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          "User-Agent": "JustSwangin/1.0 (scorecard-nearby)",
+          "Accept-Language": "en",
+        },
+        body: `data=${encodeURIComponent(query)}`,
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        lastError = `Overpass ${endpoint} error: ${response.status}`;
+        continue;
+      }
+
+      const payload = (await response.json()) as { elements?: OverpassElement[] };
+      list = (payload.elements ?? [])
+        .map((el) => mapOsmToSuggestion(el, lat, lng))
+        .filter((x): x is NearbyCourseSuggestion => Boolean(x));
+
+      if (list.length > 0) break;
+    } catch (err) {
+      lastError = err instanceof Error ? err.message : "Overpass request failed";
+    }
   }
 
-  const payload = (await response.json()) as { elements?: OverpassElement[] };
-  const list = (payload.elements ?? [])
-    .map((el) => mapOsmToSuggestion(el, lat, lng))
-    .filter((x): x is NearbyCourseSuggestion => Boolean(x));
+  if (list.length === 0 && lastError) {
+    throw new Error(lastError);
+  }
 
   const dedup = new Map<string, NearbyCourseSuggestion>();
   for (const item of list) {
@@ -99,6 +121,75 @@ async function fetchOverpassNearby(
   }
 
   return Array.from(dedup.values()).sort((a, b) => a.distanceMiles - b.distanceMiles);
+}
+
+type NominatimItem = {
+  place_id: number;
+  lat: string;
+  lon: string;
+  display_name: string;
+  name?: string;
+};
+
+async function fetchNominatimNearby(
+  lat: number,
+  lng: number,
+): Promise<NearbyCourseSuggestion[]> {
+  // Approximate ~0.35 deg box around user location (~20-25mi, depends on latitude)
+  const latDelta = 0.35;
+  const lngDelta = 0.45;
+  const left = lng - lngDelta;
+  const right = lng + lngDelta;
+  const top = lat + latDelta;
+  const bottom = lat - latDelta;
+
+  const url =
+    "https://nominatim.openstreetmap.org/search?" +
+    new URLSearchParams({
+      q: "golf course",
+      format: "jsonv2",
+      bounded: "1",
+      limit: "20",
+      viewbox: `${left},${top},${right},${bottom}`,
+      addressdetails: "0",
+    }).toString();
+
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": "JustSwangin/1.0 (scorecard-nearby)",
+      "Accept-Language": "en",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) throw new Error(`Nominatim error: ${response.status}`);
+  const items = (await response.json()) as NominatimItem[];
+
+  const mapped = items
+    .map((it) => {
+      const nlat = Number(it.lat);
+      const nlng = Number(it.lon);
+      if (!Number.isFinite(nlat) || !Number.isFinite(nlng)) return null;
+
+      const name = (it.name || it.display_name.split(",")[0] || "Golf Course").trim();
+      const local = findBestLocalCourseMatch(name);
+      return {
+        courseId: local?.courseId ?? `nominatim-${it.place_id}`,
+        name,
+        city: local?.city ?? "",
+        state: local?.state ?? "",
+        country: local?.country ?? "",
+        latitude: nlat,
+        longitude: nlng,
+        distanceMiles: distanceMiles(lat, lng, nlat, nlng),
+        source: local ? ("seed" as const) : ("osm" as const),
+        hasScorecard: Boolean(local),
+      } satisfies NearbyCourseSuggestion;
+    })
+    .filter((x): x is NearbyCourseSuggestion => Boolean(x))
+    .sort((a, b) => a.distanceMiles - b.distanceMiles);
+
+  return mapped;
 }
 
 export async function GET(request: Request) {
@@ -120,7 +211,13 @@ export async function GET(request: Request) {
   const maxItems = Math.max(1, Math.min(20, Math.round(limit)));
 
   try {
-    const osm = await fetchOverpassNearby(lat, lng, radiusMeters);
+    let osm: NearbyCourseSuggestion[] = [];
+    try {
+      osm = await fetchOverpassNearby(lat, lng, radiusMeters);
+    } catch {
+      // try second free source before falling back to seeds
+      osm = await fetchNominatimNearby(lat, lng);
+    }
     const fallbackLocal = localCoursesAsNearbySuggestions(lat, lng);
 
     const combined = [...osm, ...fallbackLocal]
@@ -130,7 +227,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       courses: combined,
-      source: "osm+seed",
+      source: osm.length ? "osm+seed" : "seed-fallback",
       radiusMiles,
     });
   } catch (error) {

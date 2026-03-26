@@ -36,6 +36,8 @@ export function ScorecardClient() {
   const [holeScoresStrokes, setHoleScoresStrokes] = useState<Array<number | null>>([]);
   const [loadingNearby, setLoadingNearby] = useState(false);
   const [loadingScorecard, setLoadingScorecard] = useState(false);
+  const [nearbySource, setNearbySource] = useState<string | null>(null);
+  const [nearbyWarning, setNearbyWarning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [geoStatus, setGeoStatus] = useState<
     "idle" | "locating" | "granted" | "denied" | "unsupported"
@@ -148,6 +150,8 @@ export function ScorecardClient() {
           if (!res.ok) throw new Error("Could not fetch nearby courses");
           const json = (await res.json()) as NearbyResponse;
           setNearbyCourses(json.courses);
+          setNearbySource(json.source ?? null);
+          setNearbyWarning(json.warning ?? null);
           const firstKnown = json.courses.find((c) => c.hasScorecard);
           if (firstKnown) {
             setSelectedCourseId(firstKnown.courseId);
@@ -210,6 +214,15 @@ export function ScorecardClient() {
       {!!nearbyCourses.length && (
         <section className="card">
           <h2 className="section-heading">Nearby suggestions</h2>
+          {nearbySource === "seed-fallback" && (
+            <p className="mb-3 text-xs text-[var(--warn)]">
+              Live nearby search is temporarily unavailable. Showing seeded courses sorted by your
+              location distance.
+            </p>
+          )}
+          {nearbyWarning && (
+            <p className="mb-3 text-xs text-[var(--section-label)]">Source note: {nearbyWarning}</p>
+          )}
           <div className="mt-2 space-y-3">
             {nearbyCourses.map((course) => (
               <button
