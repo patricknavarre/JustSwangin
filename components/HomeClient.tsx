@@ -66,7 +66,7 @@ export function HomeClient() {
       <div className="card overflow-hidden p-0">
         <div className="relative bg-gradient-to-br from-amber-200 via-orange-400 to-amber-900 px-6 py-9">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">Swing</p>
-          <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Analysis</h1>
+          <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Swing Lab</h1>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/85">
             Upload a clip — we map your motion, score it against benchmarks, and build your coach
             report.

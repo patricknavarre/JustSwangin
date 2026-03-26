@@ -45,9 +45,12 @@ export default function RootLayout({
                 >
                   Scorecard
                 </Link>
-                <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--section-label)] sm:inline">
-                  Swing lab
-                </span>
+                <Link
+                  href="/swing"
+                  className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--section-label)] transition hover:text-[var(--text)]"
+                >
+                  Swing Lab
+                </Link>
               </div>
             </div>
           </header>
