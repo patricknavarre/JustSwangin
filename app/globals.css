@@ -3,25 +3,84 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --app-bg: #ebedf0;
+  --app-bg-deep: #e2e4e8;
+  --card: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.06);
+  --text: #1c1c1e;
+  --text-secondary: #636366;
+  --section-label: #8e8e93;
+  --accent: #ff5a1f;
+  --accent-hover: #e64f18;
+  --accent-soft: rgba(255, 90, 31, 0.12);
+  --pill-track: #e5e5ea;
+  --nav-bg: #ffffff;
+  --good: #2d9d5f;
+  --warn: #c9a227;
+  --bad: #d4384c;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.07);
+  --shadow-pill-active: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-[var(--app-bg)] text-[var(--text)];
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", "Segoe UI",
+    Roboto, sans-serif;
+  min-height: 100dvh;
+}
+
+.font-display {
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.font-sans {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.app-canvas {
+  background: linear-gradient(180deg, var(--app-bg) 0%, var(--app-bg-deep) 100%);
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+
+.card {
+  @apply rounded-[1.25rem] border bg-[var(--card)] p-6;
+  border-color: var(--card-border);
+  box-shadow: var(--shadow-card);
+}
+
+.section-heading {
+  @apply mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--section-label)];
+}
+
+.btn-primary {
+  @apply rounded-2xl bg-[var(--accent)] font-bold text-white shadow-md transition;
+  box-shadow: 0 4px 14px rgba(255, 90, 31, 0.35);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+.btn-primary:disabled {
+  @apply opacity-45 shadow-none;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .pb-nav {
+    padding-bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+  }
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
   }
 }

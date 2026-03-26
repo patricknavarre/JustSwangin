@@ -1,0 +1,70 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+function NavIcon({ children }: { children: React.ReactNode }) {
+  return <span className="mb-0.5 flex h-7 w-7 items-center justify-center">{children}</span>;
+}
+
+export function MobileNav() {
+  const path = usePathname();
+  const home = path === "/";
+  const results = path === "/analyze";
+
+  return (
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/[0.06] bg-[var(--nav-bg)] pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] md:hidden"
+      aria-label="Main"
+    >
+      <div className="relative mx-auto flex max-w-lg items-end justify-between px-4 pt-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
+        <Link
+          href="/"
+          className={`flex min-h-[48px] min-w-[56px] flex-1 flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
+            home ? "text-[var(--text)]" : "text-[var(--section-label)]"
+          }`}
+        >
+          <NavIcon>
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </NavIcon>
+          Home
+        </Link>
+
+        <div className="relative -top-5 flex flex-col items-center">
+          <Link
+            href="/"
+            className="flex h-[56px] w-[56px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-fab transition active:scale-95 active:opacity-90"
+            aria-label="New swing"
+          >
+            <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                d="M12 5v14M9 20h6"
+              />
+              <circle cx="12" cy="8" r="3.25" fill="currentColor" stroke="none" />
+            </svg>
+          </Link>
+          <span className="mt-1 text-[11px] font-semibold text-[var(--section-label)]">Swing</span>
+        </div>
+
+        <Link
+          href="/analyze"
+          className={`flex min-h-[48px] min-w-[56px] flex-1 flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
+            results ? "text-[var(--text)]" : "text-[var(--section-label)]"
+          }`}
+        >
+          <NavIcon>
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </NavIcon>
+          Results
+        </Link>
+      </div>
+    </nav>
+  );
+}

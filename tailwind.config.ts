@@ -9,8 +9,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "var(--app-bg)",
+        foreground: "var(--text)",
+      },
+      fontFamily: {
+        display: [
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          '"SF Pro Display"',
+          '"Segoe UI"',
+          "Roboto",
+          "sans-serif",
+        ],
+        sans: ["ui-sans-serif", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        card: "1.25rem",
+      },
+      boxShadow: {
+        card: "0 4px 24px rgba(0, 0, 0, 0.07)",
+        fab: "0 6px 20px rgba(255, 90, 31, 0.45)",
       },
     },
   },
