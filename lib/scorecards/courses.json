@@ -1,0 +1,101 @@
+[
+  {
+    "courseId": "pebble-beach-golf-links",
+    "name": "Pebble Beach Golf Links",
+    "city": "Pebble Beach",
+    "state": "CA",
+    "country": "USA",
+    "latitude": 36.5687,
+    "longitude": -121.9482,
+    "holes": [
+      { "holeNumber": 1, "par": 4, "yardage": 377, "handicap": 18 },
+      { "holeNumber": 2, "par": 5, "yardage": 511, "handicap": 14 },
+      { "holeNumber": 3, "par": 4, "yardage": 390, "handicap": 6 },
+      { "holeNumber": 4, "par": 4, "yardage": 326, "handicap": 16 },
+      { "holeNumber": 5, "par": 3, "yardage": 192, "handicap": 8 },
+      { "holeNumber": 6, "par": 5, "yardage": 523, "handicap": 2 },
+      { "holeNumber": 7, "par": 3, "yardage": 106, "handicap": 12 },
+      { "holeNumber": 8, "par": 4, "yardage": 428, "handicap": 4 },
+      { "holeNumber": 9, "par": 4, "yardage": 462, "handicap": 10 },
+      { "holeNumber": 10, "par": 4, "yardage": 446, "handicap": 1 },
+      { "holeNumber": 11, "par": 4, "yardage": 373, "handicap": 13 },
+      { "holeNumber": 12, "par": 3, "yardage": 202, "handicap": 9 },
+      { "holeNumber": 13, "par": 4, "yardage": 403, "handicap": 7 },
+      { "holeNumber": 14, "par": 5, "yardage": 580, "handicap": 11 },
+      { "holeNumber": 15, "par": 4, "yardage": 397, "handicap": 15 },
+      { "holeNumber": 16, "par": 4, "yardage": 403, "handicap": 5 },
+      { "holeNumber": 17, "par": 3, "yardage": 208, "handicap": 17 },
+      { "holeNumber": 18, "par": 5, "yardage": 543, "handicap": 3 }
+    ],
+    "tees": [
+      { "teeId": "champ", "name": "Championship", "color": "Black", "rating": 75.5, "slope": 145, "front9Yards": 3315, "back9Yards": 3555, "totalYards": 6870 },
+      { "teeId": "member", "name": "Member", "color": "Blue", "rating": 73.0, "slope": 139, "front9Yards": 3087, "back9Yards": 3358, "totalYards": 6445 }
+    ]
+  },
+  {
+    "courseId": "torrey-pines-south",
+    "name": "Torrey Pines Golf Course (South)",
+    "city": "La Jolla",
+    "state": "CA",
+    "country": "USA",
+    "latitude": 32.9048,
+    "longitude": -117.252,
+    "holes": [
+      { "holeNumber": 1, "par": 4, "yardage": 454, "handicap": 9 },
+      { "holeNumber": 2, "par": 4, "yardage": 389, "handicap": 15 },
+      { "holeNumber": 3, "par": 3, "yardage": 201, "handicap": 17 },
+      { "holeNumber": 4, "par": 4, "yardage": 490, "handicap": 5 },
+      { "holeNumber": 5, "par": 4, "yardage": 454, "handicap": 11 },
+      { "holeNumber": 6, "par": 5, "yardage": 564, "handicap": 3 },
+      { "holeNumber": 7, "par": 4, "yardage": 462, "handicap": 7 },
+      { "holeNumber": 8, "par": 3, "yardage": 177, "handicap": 13 },
+      { "holeNumber": 9, "par": 5, "yardage": 615, "handicap": 1 },
+      { "holeNumber": 10, "par": 4, "yardage": 454, "handicap": 8 },
+      { "holeNumber": 11, "par": 3, "yardage": 225, "handicap": 16 },
+      { "holeNumber": 12, "par": 4, "yardage": 505, "handicap": 2 },
+      { "holeNumber": 13, "par": 5, "yardage": 621, "handicap": 10 },
+      { "holeNumber": 14, "par": 4, "yardage": 437, "handicap": 14 },
+      { "holeNumber": 15, "par": 4, "yardage": 480, "handicap": 6 },
+      { "holeNumber": 16, "par": 3, "yardage": 227, "handicap": 18 },
+      { "holeNumber": 17, "par": 4, "yardage": 450, "handicap": 12 },
+      { "holeNumber": 18, "par": 5, "yardage": 570, "handicap": 4 }
+    ],
+    "tees": [
+      { "teeId": "champ", "name": "Championship", "color": "Black", "rating": 78.8, "slope": 144, "front9Yards": 3806, "back9Yards": 3859, "totalYards": 7665 },
+      { "teeId": "member", "name": "Member", "color": "Blue", "rating": 75.0, "slope": 138, "front9Yards": 3510, "back9Yards": 3550, "totalYards": 7060 }
+    ]
+  },
+  {
+    "courseId": "tpc-sawgrass-stadium",
+    "name": "TPC Sawgrass (Stadium Course)",
+    "city": "Ponte Vedra Beach",
+    "state": "FL",
+    "country": "USA",
+    "latitude": 30.2044,
+    "longitude": -81.3903,
+    "holes": [
+      { "holeNumber": 1, "par": 4, "yardage": 423, "handicap": 13 },
+      { "holeNumber": 2, "par": 5, "yardage": 532, "handicap": 3 },
+      { "holeNumber": 3, "par": 3, "yardage": 177, "handicap": 17 },
+      { "holeNumber": 4, "par": 4, "yardage": 384, "handicap": 15 },
+      { "holeNumber": 5, "par": 4, "yardage": 471, "handicap": 7 },
+      { "holeNumber": 6, "par": 4, "yardage": 393, "handicap": 11 },
+      { "holeNumber": 7, "par": 4, "yardage": 451, "handicap": 1 },
+      { "holeNumber": 8, "par": 3, "yardage": 237, "handicap": 9 },
+      { "holeNumber": 9, "par": 5, "yardage": 583, "handicap": 5 },
+      { "holeNumber": 10, "par": 4, "yardage": 424, "handicap": 14 },
+      { "holeNumber": 11, "par": 5, "yardage": 558, "handicap": 4 },
+      { "holeNumber": 12, "par": 4, "yardage": 358, "handicap": 16 },
+      { "holeNumber": 13, "par": 3, "yardage": 181, "handicap": 18 },
+      { "holeNumber": 14, "par": 4, "yardage": 481, "handicap": 8 },
+      { "holeNumber": 15, "par": 4, "yardage": 470, "handicap": 2 },
+      { "holeNumber": 16, "par": 5, "yardage": 523, "handicap": 10 },
+      { "holeNumber": 17, "par": 3, "yardage": 137, "handicap": 12 },
+      { "holeNumber": 18, "par": 4, "yardage": 462, "handicap": 6 }
+    ],
+    "tees": [
+      { "teeId": "champ", "name": "Championship", "color": "Black", "rating": 76.8, "slope": 155, "front9Yards": 3651, "back9Yards": 3579, "totalYards": 7230 },
+      { "teeId": "member", "name": "Member", "color": "Blue", "rating": 73.5, "slope": 147, "front9Yards": 3332, "back9Yards": 3328, "totalYards": 6660 }
+    ]
+  }
+]

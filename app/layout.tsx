@@ -38,9 +38,17 @@ export default function RootLayout({
               <Link href="/" className="font-display text-xl text-[var(--text)]">
                 JustSwangin
               </Link>
-              <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--section-label)] sm:inline">
-                Swing lab
-              </span>
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/scorecard"
+                  className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--section-label)] transition hover:text-[var(--text)]"
+                >
+                  Scorecard
+                </Link>
+                <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--section-label)] sm:inline">
+                  Swing lab
+                </span>
+              </div>
             </div>
           </header>
           <main className="pb-nav px-safe md:pb-10">{children}</main>

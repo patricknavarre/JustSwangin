@@ -12,16 +12,17 @@ export function MobileNav() {
   const home = path === "/";
   const results = path === "/analyze";
   const swing = path === "/swing";
+  const scorecard = path === "/scorecard";
 
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/[0.06] bg-[var(--nav-bg)] pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] md:hidden"
       aria-label="Main"
     >
-      <div className="relative mx-auto flex max-w-lg items-end justify-between px-4 pt-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
+      <div className="relative mx-auto grid max-w-lg grid-cols-4 items-end px-4 pt-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
         <Link
           href="/"
-          className={`flex min-h-[48px] min-w-[56px] flex-1 flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
+          className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
             home ? "text-[var(--text)]" : "text-[var(--section-label)]"
           }`}
         >
@@ -31,6 +32,20 @@ export function MobileNav() {
             </svg>
           </NavIcon>
           Home
+        </Link>
+
+        <Link
+          href="/scorecard"
+          className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
+            scorecard ? "text-[var(--text)]" : "text-[var(--section-label)]"
+          }`}
+        >
+          <NavIcon>
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5.5A1.5 1.5 0 014.5 4h15A1.5 1.5 0 0121 5.5v13a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 18.5v-13zM7 9.5h10M7 13h10M7 16.5h4" />
+            </svg>
+          </NavIcon>
+          Scorecard
         </Link>
 
         <div className="relative -top-5 flex flex-col items-center">
@@ -56,7 +71,7 @@ export function MobileNav() {
 
         <Link
           href="/analyze"
-          className={`flex min-h-[48px] min-w-[56px] flex-1 flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
+          className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
             results ? "text-[var(--text)]" : "text-[var(--section-label)]"
           }`}
         >
