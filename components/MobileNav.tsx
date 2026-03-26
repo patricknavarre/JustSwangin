@@ -11,6 +11,7 @@ export function MobileNav() {
   const path = usePathname();
   const home = path === "/";
   const results = path === "/analyze";
+  const swing = path === "/swing";
 
   return (
     <nav
@@ -34,9 +35,11 @@ export function MobileNav() {
 
         <div className="relative -top-5 flex flex-col items-center">
           <Link
-            href="/"
-            className="flex h-[56px] w-[56px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-fab transition active:scale-95 active:opacity-90"
-            aria-label="New swing"
+            href="/swing"
+            className={`flex h-[56px] w-[56px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-fab transition active:scale-95 active:opacity-90 ${
+              swing ? "ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--nav-bg)]" : ""
+            }`}
+            aria-label="Start swing analysis"
           >
             <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path

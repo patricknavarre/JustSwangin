@@ -91,7 +91,7 @@ export function AnalyzePageClient() {
           </p>
         </div>
         <Link
-          href="/"
+          href="/swing"
           className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-2xl border border-black/[0.08] bg-white px-5 py-2.5 text-center text-base font-semibold text-[var(--text)] shadow-card transition active:opacity-80 sm:text-sm"
         >
           New analysis
