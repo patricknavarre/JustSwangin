@@ -1,22 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CourseScorecard, ScorecardCourseSummary } from "@/types/scorecard";
 import type { SavedRound, RoundId } from "@/types/round";
 import {
   loadRoundsLocal,
   sortRoundsNewestFirst,
 } from "@/lib/rounds/storage";
+import type { BettingDraft, BettingFormat as BettingFormatType, BettingPlayerDraft } from "@/lib/betting/storage";
+import { clearBettingDraft, loadBettingDraft, saveBettingDraft } from "@/lib/betting/storage";
 
-type BettingFormat = "nassau" | "skins" | "wolf" | "stableford" | "matchplay";
-
-type PlayerDraft = {
-  name: string;
-  // hole index = holeNumber-1
-  holeStrokes: Array<number | null>;
-  selectedRoundId: RoundId | null;
-  handicap?: number;
-};
+type BettingFormat = BettingFormatType;
+type PlayerDraft = BettingPlayerDraft;
 
 const PLAYER_DEFAULTS = ["Player 1", "Player 2", "Player 3", "Player 4"];
 
@@ -47,6 +42,34 @@ export function BettingTrackerClient() {
 
   const [error, setError] = useState<string | null>(null);
 
+  const draftRef = useRef<BettingDraft | null>(null);
+  const [draftHydrated, setDraftHydrated] = useState(false);
+
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingDraftRef = useRef<BettingDraft | null>(null);
+
+  function startNewGame() {
+    clearBettingDraft();
+    draftRef.current = null;
+    pendingDraftRef.current = null;
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = null;
+
+    setError(null);
+    setSelectedCourseId("");
+    setSelectedCourse(null);
+    setSelectedTeeId("");
+    setPlayersCount(2);
+    setPlayers([]);
+
+    setFormat("nassau");
+    setSkinsCarryover(false);
+    setStakePerHole(10);
+    setStakeFront9(20);
+    setStakeBack9(20);
+    setStakeOverall(20);
+  }
+
   useEffect(() => {
     void (async () => {
       try {
@@ -69,6 +92,24 @@ export function BettingTrackerClient() {
   }, []);
 
   useEffect(() => {
+    const d = loadBettingDraft();
+    if (d) {
+      draftRef.current = d;
+      setSelectedCourseId(d.selectedCourseId);
+      setSelectedTeeId(d.selectedTeeId);
+      setPlayersCount(d.playersCount);
+      setPlayers(d.players);
+      setFormat(d.format);
+      setSkinsCarryover(d.skinsCarryover);
+      setStakePerHole(d.stakePerHole);
+      setStakeFront9(d.stakeFront9);
+      setStakeBack9(d.stakeBack9);
+      setStakeOverall(d.stakeOverall);
+    }
+    setDraftHydrated(true);
+  }, []);
+
+  useEffect(() => {
     if (!selectedCourseId) {
       setSelectedCourse(null);
       setSelectedTeeId("");
@@ -83,23 +124,50 @@ export function BettingTrackerClient() {
         if (!res.ok) throw new Error("Could not load scorecard");
         const json = (await res.json()) as { course: CourseScorecard };
         setSelectedCourse(json.course);
-        setSelectedTeeId(json.course.tees[0]?.teeId ?? "");
 
-        setPlayers(
-          new Array(playersCount).fill(null).map((_, i) => ({
-            name: PLAYER_DEFAULTS[i] ?? `Player ${i + 1}`,
-            holeStrokes: new Array(json.course.holes.length).fill(null),
-            selectedRoundId: null,
-            handicap: undefined,
-          })),
-        );
+        const desiredTeeId = draftRef.current?.selectedTeeId;
+        const teeExists = desiredTeeId
+          ? json.course.tees.some((t) => t.teeId === desiredTeeId)
+          : false;
+        const effectiveTeeId = teeExists
+          ? desiredTeeId!
+          : json.course.tees[0]?.teeId ?? "";
+
+        setSelectedTeeId(effectiveTeeId);
+
+        const draftPlayers = draftRef.current?.players;
+        const draftPlayersCount = draftRef.current?.playersCount ?? playersCount;
+
+        const canRestorePlayers =
+          Array.isArray(draftPlayers) &&
+          draftPlayers.length === draftPlayersCount &&
+          draftPlayers.every((p) => p.holeStrokes.length === json.course.holes.length);
+
+        if (canRestorePlayers) {
+          // If the tee changed (e.g., scorecard data updated and teeId no longer exists), clear saved round selection.
+          const restoredPlayers = draftPlayers!.map((p) => ({
+            ...p,
+            selectedRoundId:
+              effectiveTeeId === draftRef.current?.selectedTeeId ? p.selectedRoundId : null,
+          }));
+          setPlayers(restoredPlayers);
+        } else {
+          setPlayers(
+            new Array(draftPlayersCount).fill(null).map((_, i) => ({
+              name: PLAYER_DEFAULTS[i] ?? `Player ${i + 1}`,
+              holeStrokes: new Array(json.course.holes.length).fill(null),
+              selectedRoundId: null,
+              handicap: undefined,
+            })),
+          );
+        }
       } catch (e) {
         setSelectedCourse(null);
         setError(e instanceof Error ? e.message : "Failed to load scorecard");
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCourseId]);
+  }, [selectedCourseId, draftHydrated]);
 
   useEffect(() => {
     if (!selectedCourse) return;
@@ -122,6 +190,60 @@ export function BettingTrackerClient() {
       });
     });
   }, [playersCount, selectedCourse]);
+
+  // Persist betting draft so it survives navigation away and back.
+  useEffect(() => {
+    if (!draftHydrated) return;
+    if (!selectedCourseId) return;
+    if (players.length !== playersCount) return;
+
+    const draft: BettingDraft = {
+      version: 1,
+      selectedCourseId,
+      selectedTeeId,
+      playersCount,
+      players,
+      format,
+      skinsCarryover,
+      stakePerHole,
+      stakeFront9,
+      stakeBack9,
+      stakeOverall,
+    };
+
+    pendingDraftRef.current = draft;
+
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      if (pendingDraftRef.current) saveBettingDraft(pendingDraftRef.current);
+    }, 450);
+
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    };
+  }, [
+    draftHydrated,
+    selectedCourseId,
+    selectedTeeId,
+    playersCount,
+    players,
+    format,
+    skinsCarryover,
+    stakePerHole,
+    stakeFront9,
+    stakeBack9,
+    stakeOverall,
+  ]);
+
+  // On unmount, flush the latest draft immediately.
+  useEffect(() => {
+    return () => {
+      if (pendingDraftRef.current) {
+        saveBettingDraft(pendingDraftRef.current);
+      }
+    };
+  }, []);
 
   const roundsForSelectedCourse = useMemo(() => {
     if (!selectedCourse) return [];
@@ -696,6 +818,18 @@ export function BettingTrackerClient() {
 
       <section className="card">
         <h2 className="section-heading">Settlement</h2>
+        <div className="mt-2">
+          <button
+            type="button"
+            onClick={startNewGame}
+            className="w-full rounded-2xl border border-black/[0.12] bg-white px-6 py-4 text-sm font-semibold text-[var(--text)]"
+          >
+            Start new game
+          </button>
+          <p className="mt-2 text-center text-xs text-[var(--text-secondary)]">
+            Clears the current betting setup on this device.
+          </p>
+        </div>
         {!selectedCourse ? (
           <p className="mt-2 text-sm text-[var(--text-secondary)]">Select a course to start.</p>
         ) : !canCompute ? (
