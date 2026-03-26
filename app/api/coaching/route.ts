@@ -1,7 +1,7 @@
 import Anthropic, { APIError } from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { buildCoachingPrompt } from "@/lib/claudeCoach";
-import type { CameraAngle, LaunchMonitorShot, SwingMetrics } from "@/types/swing";
+import type { CameraAngle, LaunchMonitorShot, SwingMetrics, SwingSport } from "@/types/swing";
 import type { CoachingApiResponse } from "@/types/swing";
 
 export const runtime = "nodejs";
@@ -54,6 +54,7 @@ export async function POST(request: Request) {
     cameraAngle?: CameraAngle;
     launchData?: LaunchMonitorShot[];
     playerInfo?: { handicap?: number; height?: number };
+    sport?: SwingSport;
   };
   try {
     body = await request.json();
@@ -71,6 +72,7 @@ export async function POST(request: Request) {
     handicap: body.playerInfo?.handicap,
     metrics: body.metrics,
     launchData: body.launchData,
+    sport: body.sport,
   });
 
   const model = (process.env.ANTHROPIC_MODEL ?? DEFAULT_MODEL).trim();

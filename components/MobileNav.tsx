@@ -12,6 +12,7 @@ export function MobileNav() {
   const home = path === "/";
   const results = path === "/analyze";
   const swing = path === "/swing";
+  const batLab = path === "/bat-lab" || path === "/bat-analyze";
   const scorecard = path === "/scorecard";
 
   return (
@@ -19,7 +20,7 @@ export function MobileNav() {
       className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/[0.06] bg-[var(--nav-bg)] pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] md:hidden"
       aria-label="Main"
     >
-      <div className="relative mx-auto grid max-w-lg grid-cols-4 items-end px-4 pt-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
+      <div className="relative mx-auto grid max-w-lg grid-cols-5 items-end px-4 pt-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
         <Link
           href="/"
           className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
@@ -68,6 +69,32 @@ export function MobileNav() {
           </Link>
           <span className="mt-2 text-[11px] font-semibold text-[var(--section-label)]">Swing</span>
         </div>
+
+        <Link
+          href="/bat-lab"
+          className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
+            batLab ? "text-[var(--text)]" : "text-[var(--section-label)]"
+          }`}
+        >
+          <NavIcon>
+            <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M15 3l6 6-8.5 8.5a3 3 0 11-4.24-4.24L16.76 4.76 15 3z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 20l2.2-2.2"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </NavIcon>
+          Bat Lab
+        </Link>
 
         <Link
           href="/analyze"

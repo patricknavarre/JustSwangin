@@ -1,12 +1,21 @@
-import type { CameraAngle, LaunchMonitorShot, SwingMetrics } from "@/types/swing";
+import type { CameraAngle, LaunchMonitorShot, SwingMetrics, SwingSport } from "@/types/swing";
 
 export function buildCoachingPrompt(params: {
   cameraAngle: CameraAngle;
   handicap?: number;
   metrics: SwingMetrics;
   launchData?: LaunchMonitorShot[];
+  sport?: SwingSport;
 }): string {
-  const { cameraAngle, handicap, metrics, launchData } = params;
+  const { cameraAngle, handicap, metrics, launchData, sport } = params;
+  const isBat = sport === "baseball-softball";
+  const coachRole = isBat ? "baseball and softball hitting biomechanics coach" : "golf biomechanics coach";
+  const intro = isBat
+    ? "Analyze the following hitting swing metrics and provide a prioritized coaching report."
+    : "Analyze the following swing metrics and provide a prioritized coaching report.";
+  const launchLabel = isBat
+    ? "OPTIONAL BALL-FLIGHT DATA (if provided, session summary):"
+    : "LAUNCH MONITOR DATA (TrackMan/Garmin/Rapsodo CSV — session summary):";
   const metricsJson = JSON.stringify(metrics, null, 2);
   const launchDataJson =
     launchData && launchData.length
@@ -20,16 +29,16 @@ export function buildCoachingPrompt(params: {
         )
       : "Not provided";
 
-  return `You are an expert golf biomechanics coach. Analyze the following swing metrics
-and provide a prioritized coaching report.
+  return `You are an expert ${coachRole}. ${intro}
 
 Camera angle: ${cameraAngle}
+Sport: ${isBat ? "Baseball/Softball" : "Golf"}
 Player handicap: ${handicap ?? "unknown"}
 
 SWING METRICS (deviation from research benchmarks):
 ${metricsJson}
 
-LAUNCH MONITOR DATA (TrackMan/Garmin/Rapsodo CSV — session summary):
+${launchLabel}
 ${launchDataJson}
 
 Respond with valid JSON only (no markdown fences), matching this TypeScript shape:

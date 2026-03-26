@@ -1,4 +1,5 @@
 export type CameraAngle = "face-on" | "down-the-line";
+export type SwingSport = "golf" | "baseball-softball";
 
 /** MediaPipe-compatible landmark (normalized 0–1 image space). */
 export interface Landmark {

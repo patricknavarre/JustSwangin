@@ -51,6 +51,12 @@ export default function RootLayout({
                 >
                   Swing Lab
                 </Link>
+                <Link
+                  href="/bat-lab"
+                  className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--section-label)] transition hover:text-[var(--text)]"
+                >
+                  Bat Lab
+                </Link>
               </div>
             </div>
           </header>

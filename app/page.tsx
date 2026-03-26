@@ -76,6 +76,25 @@ export default function Home() {
       </div>
 
       <div className="card">
+        <h2 className="section-heading">Bat lab</h2>
+        <p className="font-display mt-2 text-2xl text-[var(--text)]">
+          Baseball + softball swing analysis
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+          Upload your hitting clip and use the same on-device pose mapping + Anthropic coaching flow
+          tuned for baseball/softball language.
+        </p>
+        <div className="mt-5">
+          <Link
+            href="/bat-lab"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open Bat Lab
+          </Link>
+        </div>
+      </div>
+
+      <div className="card">
         <h2 className="section-heading">Digital scorecard</h2>
         <p className="font-display mt-2 text-2xl text-[var(--text)]">
           Track live rounds and review previous scores

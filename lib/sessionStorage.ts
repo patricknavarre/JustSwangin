@@ -3,6 +3,7 @@ import type {
   CoachingApiResponse,
   LaunchMonitorShot,
   PoseFrame,
+  SwingSport,
   SwingMetrics,
   SwingPhase,
 } from "@/types/swing";
@@ -10,6 +11,7 @@ import type {
 export const STORAGE_KEY = "justswangin-analysis";
 
 export interface StoredAnalysis {
+  sport?: SwingSport;
   cameraAngle: CameraAngle;
   videoUrl: string;
   frames: PoseFrame[];
@@ -26,22 +28,30 @@ export function thinFrames(frames: PoseFrame[], max = 100): PoseFrame[] {
 }
 
 export function saveAnalysis(data: StoredAnalysis): void {
+  saveAnalysisForKey(STORAGE_KEY, data);
+}
+
+export function saveAnalysisForKey(storageKey: string, data: StoredAnalysis): void {
   try {
     const payload = {
       ...data,
       frames: thinFrames(data.frames, 100),
     };
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    sessionStorage.setItem(storageKey, JSON.stringify(payload));
   } catch {
     const { frames, ...rest } = data;
     void frames;
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ ...rest, frames: [] }));
+    sessionStorage.setItem(storageKey, JSON.stringify({ ...rest, frames: [] }));
   }
 }
 
 export function loadAnalysis(): StoredAnalysis | null {
+  return loadAnalysisForKey(STORAGE_KEY);
+}
+
+export function loadAnalysisForKey(storageKey: string): StoredAnalysis | null {
   if (typeof window === "undefined") return null;
-  const raw = sessionStorage.getItem(STORAGE_KEY);
+  const raw = sessionStorage.getItem(storageKey);
   if (!raw) return null;
   try {
     return JSON.parse(raw) as StoredAnalysis;
