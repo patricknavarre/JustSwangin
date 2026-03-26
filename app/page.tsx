@@ -51,6 +51,33 @@ export default function Home() {
       </section>
 
       <div className="card">
+        <h2 className="section-heading">Digital scorecard</h2>
+        <p className="font-display mt-2 text-2xl text-[var(--text)]">
+          Track live rounds and review previous scores
+        </p>
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[var(--text-secondary)]">
+          <li>
+            Uses your location to suggest nearby courses, with manual course selection always
+            available.
+          </li>
+          <li>
+            Shows hole-by-hole layout with par and yardage, plus stroke entry for each hole.
+          </li>
+          <li>
+            Saves previous rounds on your device so you can reload and compare scores later.
+          </li>
+        </ul>
+        <div className="mt-5">
+          <Link
+            href="/scorecard"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open scorecard
+          </Link>
+        </div>
+      </div>
+
+      <div className="card">
         <h2 className="section-heading">Privacy note</h2>
         <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
           Pose landmark processing happens on-device in the browser. The app sends your computed
