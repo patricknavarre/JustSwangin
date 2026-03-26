@@ -177,7 +177,7 @@ export function ScorecardClient() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">
             Digital
           </p>
-          <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Scorecard</h1>
+          <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Swing Analysis</h1>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-white/90">
             Find nearby courses from your location and load a hole-by-hole scorecard with par and
             yardage.
