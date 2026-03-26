@@ -225,5 +225,69 @@
     "tees": [
       { "teeId": "regular", "name": "Regular", "color": "Blue", "rating": 70.4, "slope": 124, "front9Yards": 3169, "back9Yards": 3232, "totalYards": 6401 }
     ]
+  },
+  {
+    "courseId": "scholl-canyon-golf-course",
+    "name": "Scholl Canyon Golf Course",
+    "city": "Pasadena",
+    "state": "CA",
+    "country": "USA",
+    "latitude": 34.1739,
+    "longitude": -118.1677,
+    "holes": [
+      { "holeNumber": 1, "par": 4, "yardage": 341, "handicap": 13 },
+      { "holeNumber": 2, "par": 5, "yardage": 497, "handicap": 3 },
+      { "holeNumber": 3, "par": 3, "yardage": 168, "handicap": 17 },
+      { "holeNumber": 4, "par": 4, "yardage": 372, "handicap": 7 },
+      { "holeNumber": 5, "par": 4, "yardage": 355, "handicap": 11 },
+      { "holeNumber": 6, "par": 3, "yardage": 152, "handicap": 18 },
+      { "holeNumber": 7, "par": 5, "yardage": 518, "handicap": 1 },
+      { "holeNumber": 8, "par": 4, "yardage": 384, "handicap": 9 },
+      { "holeNumber": 9, "par": 4, "yardage": 347, "handicap": 15 },
+      { "holeNumber": 10, "par": 4, "yardage": 358, "handicap": 12 },
+      { "holeNumber": 11, "par": 3, "yardage": 174, "handicap": 16 },
+      { "holeNumber": 12, "par": 4, "yardage": 392, "handicap": 6 },
+      { "holeNumber": 13, "par": 5, "yardage": 525, "handicap": 2 },
+      { "holeNumber": 14, "par": 4, "yardage": 367, "handicap": 10 },
+      { "holeNumber": 15, "par": 3, "yardage": 161, "handicap": 14 },
+      { "holeNumber": 16, "par": 4, "yardage": 379, "handicap": 8 },
+      { "holeNumber": 17, "par": 4, "yardage": 349, "handicap": 5 },
+      { "holeNumber": 18, "par": 5, "yardage": 512, "handicap": 4 }
+    ],
+    "tees": [
+      { "teeId": "regular", "name": "Regular", "color": "Blue", "rating": 70.6, "slope": 126, "front9Yards": 3134, "back9Yards": 3217, "totalYards": 6351 }
+    ]
+  },
+  {
+    "courseId": "roosevelt-golf-course",
+    "name": "Roosevelt Golf Course",
+    "city": "Los Angeles",
+    "state": "CA",
+    "country": "USA",
+    "latitude": 34.1269,
+    "longitude": -118.2943,
+    "holes": [
+      { "holeNumber": 1, "par": 4, "yardage": 328, "handicap": 11 },
+      { "holeNumber": 2, "par": 3, "yardage": 165, "handicap": 17 },
+      { "holeNumber": 3, "par": 5, "yardage": 486, "handicap": 3 },
+      { "holeNumber": 4, "par": 4, "yardage": 362, "handicap": 7 },
+      { "holeNumber": 5, "par": 4, "yardage": 349, "handicap": 13 },
+      { "holeNumber": 6, "par": 3, "yardage": 151, "handicap": 18 },
+      { "holeNumber": 7, "par": 5, "yardage": 503, "handicap": 1 },
+      { "holeNumber": 8, "par": 4, "yardage": 371, "handicap": 9 },
+      { "holeNumber": 9, "par": 4, "yardage": 336, "handicap": 15 },
+      { "holeNumber": 10, "par": 4, "yardage": 344, "handicap": 12 },
+      { "holeNumber": 11, "par": 3, "yardage": 169, "handicap": 16 },
+      { "holeNumber": 12, "par": 4, "yardage": 384, "handicap": 6 },
+      { "holeNumber": 13, "par": 5, "yardage": 518, "handicap": 2 },
+      { "holeNumber": 14, "par": 4, "yardage": 356, "handicap": 10 },
+      { "holeNumber": 15, "par": 3, "yardage": 158, "handicap": 14 },
+      { "holeNumber": 16, "par": 4, "yardage": 372, "handicap": 8 },
+      { "holeNumber": 17, "par": 4, "yardage": 341, "handicap": 5 },
+      { "holeNumber": 18, "par": 5, "yardage": 507, "handicap": 4 }
+    ],
+    "tees": [
+      { "teeId": "regular", "name": "Regular", "color": "Blue", "rating": 69.8, "slope": 122, "front9Yards": 3051, "back9Yards": 3149, "totalYards": 6200 }
+    ]
   }
 ]
