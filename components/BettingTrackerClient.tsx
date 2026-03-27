@@ -15,6 +15,64 @@ type PlayerDraft = BettingPlayerDraft;
 
 const PLAYER_DEFAULTS = ["Player 1", "Player 2", "Player 3", "Player 4"];
 
+const GAME_EXPLAINERS: Array<{
+  id: BettingFormat;
+  title: string;
+  quick: string;
+  detail: string[];
+}> = [
+  {
+    id: "nassau",
+    title: "Nassau",
+    quick: "Three mini bets in one round: front 9, back 9, and overall 18.",
+    detail: [
+      "You are effectively playing 3 separate games: holes 1-9, holes 10-18, and total round.",
+      "Lowest score in each segment wins that segment's stake.",
+      "If there is a tie in a segment, nobody wins that segment in this v1 setup.",
+    ],
+  },
+  {
+    id: "skins",
+    title: "Skins",
+    quick: "Each hole is its own bet. Win a hole outright to win the skin.",
+    detail: [
+      "Lowest score on a hole wins that hole's skin.",
+      "If the hole is tied, it carries over only when carry-over is enabled.",
+      "At the end, each player's net payout reflects skins won vs. lost.",
+    ],
+  },
+  {
+    id: "wolf",
+    title: "Wolf",
+    quick: "One player is the 'wolf' each hole and competes against the field.",
+    detail: [
+      "Wolf rotates by hole (player order loops each hole).",
+      "If wolf has the lowest score (or ties lowest), wolf wins that hole's stake.",
+      "If wolf loses the hole, stake is paid to the hole winner(s).",
+    ],
+  },
+  {
+    id: "stableford",
+    title: "Stableford",
+    quick: "You earn points on each hole based on score vs. par.",
+    detail: [
+      "Higher total points wins (instead of lowest stroke total).",
+      "This app uses a simple modified points model for v1.",
+      "Winner takes overall stake, split if tied.",
+    ],
+  },
+  {
+    id: "matchplay",
+    title: "Match Play",
+    quick: "You win holes, not total strokes.",
+    detail: [
+      "Each hole is won/lost/tied. Whoever wins more holes wins the match.",
+      "Current v1 settlement supports 2-player match play best.",
+      "If tied, payout is split/tied based on entered stake.",
+    ],
+  },
+];
+
 function teeById(tees: CourseScorecard["tees"], teeId: string): CourseScorecard["tees"][number] {
   return tees.find((t) => t.teeId === teeId) ?? tees[0];
 }
@@ -731,6 +789,37 @@ export function BettingTrackerClient() {
 
       <section className="card">
         <h2 className="section-heading">Game format</h2>
+        <details className="mt-3 rounded-2xl border border-black/[0.08] bg-white p-4">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--text)]">
+            How these games work
+          </summary>
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            Quick golf-betting cheat sheet. Pick your format, then use the setup above.
+          </p>
+          <div className="mt-3 space-y-3">
+            {GAME_EXPLAINERS.map((g) => {
+              const active = g.id === format;
+              return (
+                <div
+                  key={g.id}
+                  className={`rounded-xl border px-3 py-3 ${
+                    active
+                      ? "border-[var(--accent)]/40 bg-[var(--accent-soft)]"
+                      : "border-black/[0.08] bg-[var(--card)]"
+                  }`}
+                >
+                  <p className="text-sm font-bold text-[var(--text)]">{g.title}</p>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)]">{g.quick}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[var(--text-secondary)]">
+                    {g.detail.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </details>
         <div className="mt-4 space-y-4">
           <label className="block text-sm font-medium text-[var(--text)]">
             Format
