@@ -611,6 +611,15 @@ export function BettingTrackerClient() {
       </div>
 
       <section className="card">
+        <h2 className="section-heading">Before you start</h2>
+        <p className="text-sm text-[var(--text-secondary)]">
+          First choose a <strong className="text-[var(--text)]">course</strong> and{" "}
+          <strong className="text-[var(--text)]">tee</strong> in the Setup section below. Once those
+          are selected, player scoring and game settlement become available.
+        </p>
+      </section>
+
+      <section className="card">
         <h2 className="section-heading">Setup</h2>
 
         <div className="mt-4 space-y-4">
