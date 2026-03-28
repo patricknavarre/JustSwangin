@@ -1,4 +1,15 @@
 export type CameraAngle = "face-on" | "down-the-line";
+
+/** User-selected club / motion context for golf Swing Lab (not ball-flight shot shape). */
+export type GolfShotType = "driver" | "iron" | "wedge" | "chip";
+
+export const GOLF_SHOT_LABELS: Record<GolfShotType, string> = {
+  driver: "Driver",
+  iron: "Iron / hybrid",
+  wedge: "Wedge",
+  chip: "Chip / pitch",
+};
+
 export type SwingSport = "golf" | "baseball-softball";
 
 /** MediaPipe-compatible landmark (normalized 0–1 image space). */

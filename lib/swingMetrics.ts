@@ -1,5 +1,6 @@
 import type {
   CameraAngle,
+  GolfShotType,
   Landmark,
   PoseFrame,
   SwingMetrics,
@@ -7,7 +8,7 @@ import type {
   SwingPhaseName,
   MetricDeviation,
 } from "@/types/swing";
-import { SWING_BENCHMARKS as BENCH, metricStatus } from "@/lib/benchmarks";
+import { getSwingBenchmarks, metricStatus } from "@/lib/benchmarks";
 
 const LM = {
   nose: 0,
@@ -155,7 +156,9 @@ export function computeSwingMetrics(
   frames: PoseFrame[],
   phases: SwingPhase[],
   cameraAngle: CameraAngle,
+  golfShotType: GolfShotType = "driver",
 ): SwingMetrics {
+  const bench = getSwingBenchmarks(golfShotType);
   const addressFrames = avgPhaseFrames(frames, phases, "address");
   const topFrame = frameAtPhase(frames, phases, "top");
   const impactFrame = frameAtPhase(frames, phases, "impact");
@@ -209,7 +212,7 @@ export function computeSwingMetrics(
   const impactLm = impactFrame?.landmarks ?? frames[Math.floor(frames.length * 0.5)].landmarks;
   const hipSepImpact = hipShoulderSeparationDeg(impactLm);
 
-  const tempoRatio = estimateTempo(frames, phases);
+  const tempoRatio = estimateTempo(frames, phases, bench.tempoRatio.ideal);
 
   const headLat = headLateralInches(frames);
 
@@ -218,112 +221,112 @@ export function computeSwingMetrics(
       name: "Hip–shoulder separation at impact",
       value: hipSepImpact,
       unit: "°",
-      benchmarkMin: BENCH.hipShoulderSeparationAtImpact.min,
-      benchmarkIdeal: BENCH.hipShoulderSeparationAtImpact.ideal,
-      benchmarkMax: BENCH.hipShoulderSeparationAtImpact.max,
+      benchmarkMin: bench.hipShoulderSeparationAtImpact.min,
+      benchmarkIdeal: bench.hipShoulderSeparationAtImpact.ideal,
+      benchmarkMax: bench.hipShoulderSeparationAtImpact.max,
       status: metricStatus(
         hipSepImpact,
-        BENCH.hipShoulderSeparationAtImpact.min,
-        BENCH.hipShoulderSeparationAtImpact.ideal,
-        BENCH.hipShoulderSeparationAtImpact.max,
+        bench.hipShoulderSeparationAtImpact.min,
+        bench.hipShoulderSeparationAtImpact.ideal,
+        bench.hipShoulderSeparationAtImpact.max,
       ),
     },
     {
       name: "Spine tilt at address",
       value: spineTiltClamped,
       unit: "°",
-      benchmarkMin: BENCH.spineTiltAtAddress.min,
-      benchmarkIdeal: BENCH.spineTiltAtAddress.ideal,
-      benchmarkMax: BENCH.spineTiltAtAddress.max,
+      benchmarkMin: bench.spineTiltAtAddress.min,
+      benchmarkIdeal: bench.spineTiltAtAddress.ideal,
+      benchmarkMax: bench.spineTiltAtAddress.max,
       status: metricStatus(
         spineTiltClamped,
-        BENCH.spineTiltAtAddress.min,
-        BENCH.spineTiltAtAddress.ideal,
-        BENCH.spineTiltAtAddress.max,
+        bench.spineTiltAtAddress.min,
+        bench.spineTiltAtAddress.ideal,
+        bench.spineTiltAtAddress.max,
       ),
     },
     {
       name: "Knee flex at address",
       value: kneeFlex,
       unit: "°",
-      benchmarkMin: BENCH.kneeFlexAtAddress.min,
-      benchmarkIdeal: BENCH.kneeFlexAtAddress.ideal,
-      benchmarkMax: BENCH.kneeFlexAtAddress.max,
+      benchmarkMin: bench.kneeFlexAtAddress.min,
+      benchmarkIdeal: bench.kneeFlexAtAddress.ideal,
+      benchmarkMax: bench.kneeFlexAtAddress.max,
       status: metricStatus(
         kneeFlex,
-        BENCH.kneeFlexAtAddress.min,
-        BENCH.kneeFlexAtAddress.ideal,
-        BENCH.kneeFlexAtAddress.max,
+        bench.kneeFlexAtAddress.min,
+        bench.kneeFlexAtAddress.ideal,
+        bench.kneeFlexAtAddress.max,
       ),
     },
     {
       name: "Lead arm extension at top",
       value: leadArmExtensionAtTopDeg,
       unit: "°",
-      benchmarkMin: BENCH.leadArmExtensionAtTop.min,
-      benchmarkIdeal: BENCH.leadArmExtensionAtTop.ideal,
-      benchmarkMax: BENCH.leadArmExtensionAtTop.max,
+      benchmarkMin: bench.leadArmExtensionAtTop.min,
+      benchmarkIdeal: bench.leadArmExtensionAtTop.ideal,
+      benchmarkMax: bench.leadArmExtensionAtTop.max,
       status: metricStatus(
         leadArmExtensionAtTopDeg,
-        BENCH.leadArmExtensionAtTop.min,
-        BENCH.leadArmExtensionAtTop.ideal,
-        BENCH.leadArmExtensionAtTop.max,
+        bench.leadArmExtensionAtTop.min,
+        bench.leadArmExtensionAtTop.ideal,
+        bench.leadArmExtensionAtTop.max,
       ),
     },
     {
       name: "Hip rotation (backswing)",
       value: hipRotBack,
       unit: "°",
-      benchmarkMin: BENCH.hipRotationBackswing.min,
-      benchmarkIdeal: BENCH.hipRotationBackswing.ideal,
-      benchmarkMax: BENCH.hipRotationBackswing.max,
+      benchmarkMin: bench.hipRotationBackswing.min,
+      benchmarkIdeal: bench.hipRotationBackswing.ideal,
+      benchmarkMax: bench.hipRotationBackswing.max,
       status: metricStatus(
         hipRotBack,
-        BENCH.hipRotationBackswing.min,
-        BENCH.hipRotationBackswing.ideal,
-        BENCH.hipRotationBackswing.max,
+        bench.hipRotationBackswing.min,
+        bench.hipRotationBackswing.ideal,
+        bench.hipRotationBackswing.max,
       ),
     },
     {
       name: "Hip rotation (follow-through)",
       value: maxHipFt,
       unit: "°",
-      benchmarkMin: BENCH.hipRotationFollowThrough.min,
-      benchmarkIdeal: BENCH.hipRotationFollowThrough.ideal,
-      benchmarkMax: BENCH.hipRotationFollowThrough.max,
+      benchmarkMin: bench.hipRotationFollowThrough.min,
+      benchmarkIdeal: bench.hipRotationFollowThrough.ideal,
+      benchmarkMax: bench.hipRotationFollowThrough.max,
       status: metricStatus(
         maxHipFt,
-        BENCH.hipRotationFollowThrough.min,
-        BENCH.hipRotationFollowThrough.ideal,
-        BENCH.hipRotationFollowThrough.max,
+        bench.hipRotationFollowThrough.min,
+        bench.hipRotationFollowThrough.ideal,
+        bench.hipRotationFollowThrough.max,
       ),
     },
     {
       name: "Swing tempo (back : down)",
       value: tempoRatio,
       unit: ":1",
-      benchmarkMin: BENCH.tempoRatio.min,
-      benchmarkIdeal: BENCH.tempoRatio.ideal,
-      benchmarkMax: BENCH.tempoRatio.max,
+      benchmarkMin: bench.tempoRatio.min,
+      benchmarkIdeal: bench.tempoRatio.ideal,
+      benchmarkMax: bench.tempoRatio.max,
       status: metricStatus(
         tempoRatio,
-        BENCH.tempoRatio.min,
-        BENCH.tempoRatio.ideal,
-        BENCH.tempoRatio.max,
+        bench.tempoRatio.min,
+        bench.tempoRatio.ideal,
+        bench.tempoRatio.max,
       ),
     },
     {
       name: "Head lateral movement",
       value: headLat,
       unit: "in",
-      benchmarkMin: BENCH.headLateralMovement.min,
-      benchmarkIdeal: BENCH.headLateralMovement.ideal,
-      benchmarkMax: BENCH.headLateralMovement.max,
+      benchmarkMin: bench.headLateralMovement.min,
+      benchmarkIdeal: bench.headLateralMovement.ideal,
+      benchmarkMax: bench.headLateralMovement.max,
       status: metricStatus(
         headLat,
-        BENCH.headLateralMovement.min,
-        BENCH.headLateralMovement.ideal,
-        BENCH.headLateralMovement.max,
+        bench.headLateralMovement.min,
+        bench.headLateralMovement.ideal,
+        bench.headLateralMovement.max,
         true,
       ),
     },
@@ -342,10 +345,10 @@ export function computeSwingMetrics(
   };
 }
 
-function estimateTempo(frames: PoseFrame[], phases: SwingPhase[]): number {
+function estimateTempo(frames: PoseFrame[], phases: SwingPhase[], tempoIdeal: number): number {
   const top = phases.find((p) => p.name === "top");
   const impact = phases.find((p) => p.name === "impact");
-  if (!top || !impact) return BENCH.tempoRatio.ideal;
+  if (!top || !impact) return tempoIdeal;
   const back = Math.max(1, top.endMs - frames[0].t);
   const down = Math.max(1, impact.startMs - top.endMs);
   const r = back / down;

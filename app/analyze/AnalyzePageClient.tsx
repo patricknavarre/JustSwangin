@@ -7,7 +7,7 @@ import { MetricsPanel } from "@/components/MetricsPanel";
 import { PhaseTimeline } from "@/components/PhaseTimeline";
 import { CoachingReport } from "@/components/CoachingReport";
 import { loadAnalysis, type StoredAnalysis } from "@/lib/sessionStorage";
-import type { CoachingApiResponse } from "@/types/swing";
+import { GOLF_SHOT_LABELS, type CoachingApiResponse, type GolfShotType } from "@/types/swing";
 
 export function AnalyzePageClient() {
   const [data, setData] = useState<StoredAnalysis | null>(null);
@@ -26,6 +26,7 @@ export function AnalyzePageClient() {
     let cancelled = false;
     (async () => {
       try {
+        const golfShotType: GolfShotType = s.golfShotType ?? "driver";
         const res = await fetch("/api/coaching", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -33,6 +34,7 @@ export function AnalyzePageClient() {
             metrics: s.metrics,
             cameraAngle: s.cameraAngle,
             launchData: s.launchData,
+            golfShotType,
           }),
         });
         if (!res.ok) {
@@ -80,6 +82,8 @@ export function AnalyzePageClient() {
       ? data.frames[data.frames.length - 1].t - data.frames[0].t
       : 0;
 
+  const resolvedShot: GolfShotType = data.golfShotType ?? "driver";
+
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-2xl sm:py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -88,6 +92,8 @@ export function AnalyzePageClient() {
           <h1 className="font-display text-3xl text-[var(--text)]">Your swing</h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
             {data.cameraAngle === "face-on" ? "Face-on" : "Down-the-line"}
+            {" · "}
+            Scored as {GOLF_SHOT_LABELS[resolvedShot]}
           </p>
         </div>
         <Link

@@ -1,4 +1,11 @@
-import type { CameraAngle, LaunchMonitorShot, SwingMetrics, SwingSport } from "@/types/swing";
+import {
+  GOLF_SHOT_LABELS,
+  type CameraAngle,
+  type GolfShotType,
+  type LaunchMonitorShot,
+  type SwingMetrics,
+  type SwingSport,
+} from "@/types/swing";
 
 export function buildCoachingPrompt(params: {
   cameraAngle: CameraAngle;
@@ -6,8 +13,10 @@ export function buildCoachingPrompt(params: {
   metrics: SwingMetrics;
   launchData?: LaunchMonitorShot[];
   sport?: SwingSport;
+  /** Golf only — omitted for baseball/softball. */
+  golfShotType?: GolfShotType;
 }): string {
-  const { cameraAngle, handicap, metrics, launchData, sport } = params;
+  const { cameraAngle, handicap, metrics, launchData, sport, golfShotType } = params;
   const isBat = sport === "baseball-softball";
   const coachRole = isBat ? "baseball and softball hitting biomechanics coach" : "golf biomechanics coach";
   const intro = isBat
@@ -29,11 +38,16 @@ export function buildCoachingPrompt(params: {
         )
       : "Not provided";
 
+  const shotLine =
+    !isBat && golfShotType
+      ? `Golf shot type: ${GOLF_SHOT_LABELS[golfShotType]} (${golfShotType}). Interpret every metric and drill in this context — e.g. for chip/pitch, de-emphasize full-swing hip turn expectations and prioritize strike, low point, and quiet upper body; for driver vs iron, note typical setup and path differences where relevant.\n`
+      : "";
+
   return `You are an expert ${coachRole}. ${intro}
 
 Camera angle: ${cameraAngle}
 Sport: ${isBat ? "Baseball/Softball" : "Golf"}
-Player handicap: ${handicap ?? "unknown"}
+${shotLine}Player handicap: ${handicap ?? "unknown"}
 
 SWING METRICS (deviation from research benchmarks):
 ${metricsJson}
@@ -56,6 +70,7 @@ Respond with valid JSON only (no markdown fences), matching this TypeScript shap
 }
 
 Rules:
+- If a golf shot type was given above, weight issues for that motion (do not coach driver-only ideas for a chip, and vice versa).
 - Top 3 priority fixes (most impact first), each with issue, why it matters, one drill, and if launch data exists reference numbers (e.g. "your -4.2° club path confirms...").
 - Two secondary adjustments.
 - Two things the player is doing well.

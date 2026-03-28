@@ -7,14 +7,25 @@ import { LaunchMonitorImport } from "@/components/LaunchMonitorImport";
 import { extractPoseFromVideo } from "@/lib/mediapipe";
 import { detectPhases, computeSwingMetrics } from "@/lib/swingMetrics";
 import { saveAnalysis } from "@/lib/sessionStorage";
-import type { CameraAngle, LaunchMonitorShot } from "@/types/swing";
+import {
+  GOLF_SHOT_LABELS,
+  type CameraAngle,
+  type GolfShotType,
+  type LaunchMonitorShot,
+} from "@/types/swing";
 
 const MAX_MB = Number(process.env.NEXT_PUBLIC_MAX_VIDEO_MB ?? "100");
+
+const GOLF_SHOT_OPTIONS = (Object.keys(GOLF_SHOT_LABELS) as GolfShotType[]).map((id) => ({
+  id,
+  label: GOLF_SHOT_LABELS[id],
+}));
 
 export function HomeClient() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [angle, setAngle] = useState<CameraAngle>("down-the-line");
+  const [golfShotType, setGolfShotType] = useState<GolfShotType>("driver");
   const [launchShots, setLaunchShots] = useState<LaunchMonitorShot[]>([]);
   const [launchLabel, setLaunchLabel] = useState<string>("");
   const [busy, setBusy] = useState(false);
@@ -39,9 +50,10 @@ export function HomeClient() {
       }
       setStep("Computing metrics…");
       const phases = detectPhases(frames);
-      const metrics = computeSwingMetrics(frames, phases, angle);
+      const metrics = computeSwingMetrics(frames, phases, angle, golfShotType);
 
       saveAnalysis({
+        golfShotType,
         cameraAngle: angle,
         videoUrl: url,
         frames,
@@ -59,7 +71,7 @@ export function HomeClient() {
       setBusy(false);
       setStep(null);
     }
-  }, [file, angle, launchShots, router]);
+  }, [file, angle, golfShotType, launchShots, router]);
 
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-xl sm:py-10">
@@ -99,6 +111,32 @@ export function HomeClient() {
                 onClick={() => setAngle(opt.id)}
                 className={`min-h-[48px] flex-1 rounded-full px-2 py-3 text-center text-base font-semibold transition-all sm:text-sm ${
                   angle === opt.id
+                    ? "bg-white text-[var(--text)] shadow-[var(--shadow-pill-active)]"
+                    : "text-[var(--text-secondary)]"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="section-heading">Shot type</h2>
+        <div className="card py-2">
+          <p className="mb-3 px-2 text-sm text-[var(--text-secondary)]">
+            What you&apos;re hitting — benchmarks and coaching use this context.
+          </p>
+          <div className="grid grid-cols-2 gap-1.5 rounded-2xl bg-[var(--pill-track)] p-1.5 sm:grid-cols-4 sm:rounded-full">
+            {GOLF_SHOT_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                disabled={busy}
+                onClick={() => setGolfShotType(opt.id)}
+                className={`min-h-[48px] rounded-full px-2 py-3 text-center text-sm font-semibold transition-all sm:text-sm ${
+                  golfShotType === opt.id
                     ? "bg-white text-[var(--text)] shadow-[var(--shadow-pill-active)]"
                     : "text-[var(--text-secondary)]"
                 }`}

@@ -1,6 +1,7 @@
 import type {
   CameraAngle,
   CoachingApiResponse,
+  GolfShotType,
   LaunchMonitorShot,
   PoseFrame,
   SwingSport,
@@ -12,6 +13,8 @@ export const STORAGE_KEY = "justswangin-analysis";
 
 export interface StoredAnalysis {
   sport?: SwingSport;
+  /** Golf Swing Lab only; omitted in older saved sessions → treat as driver. */
+  golfShotType?: GolfShotType;
   cameraAngle: CameraAngle;
   videoUrl: string;
   frames: PoseFrame[];
