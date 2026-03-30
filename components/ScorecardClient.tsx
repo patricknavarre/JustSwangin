@@ -180,7 +180,8 @@ export function ScorecardClient() {
           <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Scorecard</h1>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-white/90">
             Find nearby courses from your location and load a hole-by-hole scorecard with par and
-            yardage.
+            yardage. Includes a full NJ / PA directory (Westfield-area public tracks) with
+            scorecard data from the course guide — confirm yardages with the pro shop when in doubt.
           </p>
         </div>
       </div>

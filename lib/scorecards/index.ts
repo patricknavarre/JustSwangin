@@ -1,11 +1,12 @@
 import courses from "./courses.json";
+import njPaCourses from "./nj-pa-directory.json";
 import type {
   CourseScorecard,
   NearbyCourseSuggestion,
   ScorecardCourseSummary,
 } from "@/types/scorecard";
 
-const courseData = courses as CourseScorecard[];
+const courseData = [...(courses as CourseScorecard[]), ...(njPaCourses as CourseScorecard[])];
 
 export function listScorecardCourses(): ScorecardCourseSummary[] {
   return courseData.map((c) => ({
