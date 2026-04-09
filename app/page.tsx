@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AddToHomeScreenModal } from "@/components/AddToHomeScreenModal";
 
 export default function Home() {
   return (
@@ -23,6 +24,7 @@ export default function Home() {
             >
               Start swing analysis
             </Link>
+            <AddToHomeScreenModal />
           </div>
         </div>
       </div>
