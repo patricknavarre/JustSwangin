@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AddToHomeScreenModal } from "@/components/AddToHomeScreenModal";
+import { NavLink } from "@/components/NavLink";
 
 export default function Home() {
   return (
@@ -47,6 +48,47 @@ export default function Home() {
           </li>
         </ol>
       </section>
+
+      <div className="card">
+        <h2 className="section-heading">Range finder</h2>
+        <p className="font-display mt-2 text-2xl text-[var(--text)]">
+          Yardage and terrain along your line of sight
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+          Built for the walk between shots: your phone becomes a sight picture with GPS-backed numbers
+          and a quick terrain read—no laser, but surprisingly useful when you know the pin location.
+        </p>
+        <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[var(--text-secondary)]">
+          <li>
+            <strong className="text-[var(--text)]">Live camera HUD</strong> with a reticle overlay so
+            you can frame the target the way you see it on the course.
+          </li>
+          <li>
+            <strong className="text-[var(--text)]">Map pin or coordinates</strong> define where you
+            are playing to; distance and bearing are computed from your GPS fix to that point.
+          </li>
+          <li>
+            <strong className="text-[var(--text)]">Optional compass</strong> helps you rotate into
+            the bearing toward the pin (where your device supports it).
+          </li>
+          <li>
+            <strong className="text-[var(--text)]">Elevation profile</strong> along the same line—
+            sampled from elevation data for a rough sense of uphill, downhill, and ridges in play.
+          </li>
+        </ul>
+        <p className="mt-3 text-xs leading-relaxed text-[var(--section-label)]">
+          Yardage is GPS-to-pin, not optical laser distance. Elevation is approximate (DEM); confirm
+          critical numbers with markers or a rangefinder when it matters.
+        </p>
+        <div className="mt-5">
+          <NavLink
+            href="/range-finder"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open range finder
+          </NavLink>
+        </div>
+      </div>
 
       <div className="card">
         <h2 className="section-heading">Privacy note</h2>
@@ -98,11 +140,17 @@ export default function Home() {
           Build your friend-group favorites
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
-          Three utility pages made for weekends: betting, club distances from TrackMan data, and a
-          lightweight strokes gained calculator.
+          Four utility flows for weekends: on-course range finder, betting, club distances from
+          launch-monitor CSVs, and a lightweight strokes gained calculator.
         </p>
 
         <div className="mt-5 space-y-3">
+          <NavLink
+            href="/range-finder"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open range finder
+          </NavLink>
           <Link
             href="/betting-tracker"
             className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
