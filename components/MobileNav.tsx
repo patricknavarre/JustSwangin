@@ -1,10 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NavLink } from "@/components/NavLink";
 
 function NavIcon({ children }: { children: React.ReactNode }) {
   return <span className="mb-0.5 flex h-7 w-7 items-center justify-center">{children}</span>;
+}
+
+function closeMobileMoreMenu() {
+  const d = document.querySelector('nav[aria-label="Main"] details.site-menu');
+  if (d instanceof HTMLDetailsElement) d.open = false;
 }
 
 export function MobileNav() {
@@ -26,7 +31,7 @@ export function MobileNav() {
       aria-label="Main"
     >
       <div className="relative mx-auto grid max-w-lg grid-cols-5 items-end px-4 pt-2 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
-        <Link
+        <NavLink
           href="/"
           className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
             home ? "text-[var(--text)]" : "text-[var(--section-label)]"
@@ -38,9 +43,9 @@ export function MobileNav() {
             </svg>
           </NavIcon>
           Home
-        </Link>
+        </NavLink>
 
-        <Link
+        <NavLink
           href="/scorecard"
           className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
             scorecard ? "text-[var(--text)]" : "text-[var(--section-label)]"
@@ -52,10 +57,10 @@ export function MobileNav() {
             </svg>
           </NavIcon>
           Scorecard
-        </Link>
+        </NavLink>
 
         <div className="relative flex flex-col items-center">
-          <Link
+          <NavLink
             href="/range-finder"
             className={`nav-fab-feature flex h-[56px] w-[56px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full text-white transition active:scale-95 active:opacity-90 ${
               rangeFinder ? "ring-2 ring-[var(--fab-feature)] ring-offset-2 ring-offset-[var(--nav-bg)]" : ""
@@ -71,11 +76,11 @@ export function MobileNav() {
                 d="M12 5v2M12 17v2M5 12h2M17 12h2"
               />
             </svg>
-          </Link>
+          </NavLink>
           <span className="mt-2 text-[11px] font-semibold text-[var(--section-label)]">Range</span>
         </div>
 
-        <Link
+        <NavLink
           href="/swing"
           className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
             swing ? "text-[var(--text)]" : "text-[var(--section-label)]"
@@ -93,7 +98,7 @@ export function MobileNav() {
             </svg>
           </NavIcon>
           Swing
-        </Link>
+        </NavLink>
 
         <div className="relative">
           <details className="site-menu group">
@@ -121,46 +126,51 @@ export function MobileNav() {
             </summary>
             <div className="absolute bottom-[4.25rem] right-0 w-56 rounded-2xl border border-black/[0.08] bg-white p-2 shadow-card">
               <div className="flex flex-col gap-1">
-                <Link
+                <NavLink
                   href="/bat-lab"
+                  onClick={closeMobileMoreMenu}
                   className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
                     batLab ? "text-[var(--water-hazard)]" : "text-[var(--text)]"
                   }`}
                 >
                   Bat Lab
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   href="/analyze"
+                  onClick={closeMobileMoreMenu}
                   className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
                     results ? "text-[var(--accent)]" : "text-[var(--text)]"
                   }`}
                 >
                   Results
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   href="/betting-tracker"
+                  onClick={closeMobileMoreMenu}
                   className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
                     betting ? "text-[var(--accent)]" : "text-[var(--text)]"
                   }`}
                 >
                   Betting Tracker
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   href="/club-averages"
+                  onClick={closeMobileMoreMenu}
                   className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
                     clubAverages ? "text-[var(--accent)]" : "text-[var(--text)]"
                   }`}
                 >
                   Club Averages
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   href="/strokes-gained"
+                  onClick={closeMobileMoreMenu}
                   className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
                     strokesGained ? "text-[var(--accent)]" : "text-[var(--text)]"
                   }`}
                 >
                   Strokes Gained
-                </Link>
+                </NavLink>
               </div>
             </div>
           </details>
