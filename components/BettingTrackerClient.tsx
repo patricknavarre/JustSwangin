@@ -599,7 +599,7 @@ export function BettingTrackerClient() {
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-2xl sm:py-10">
       <div className="card overflow-hidden p-0">
-        <div className="relative bg-gradient-to-br from-emerald-200 via-green-500 to-emerald-900 px-6 py-9">
+        <div className="relative hero-masters px-6 py-9">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">
             Betting tracker
           </p>

@@ -122,16 +122,16 @@ export function AnalyzePageClient() {
           </p>
         )}
         {coachingError && (
-          <div className="card border-amber-200 bg-amber-50/90 text-sm text-amber-950">
+          <div className="card border-[var(--warn)]/35 bg-[#faf6ec] text-sm text-[var(--deep-pine)]">
             <p className="font-semibold">Coaching report unavailable</p>
-            <p className="mt-2 whitespace-pre-wrap text-amber-900/85">{coachingError}</p>
-            <p className="mt-3 text-xs text-amber-800/80">
+            <p className="mt-2 whitespace-pre-wrap text-[var(--text)]">{coachingError}</p>
+            <p className="mt-3 text-xs text-[var(--text-secondary)]">
               Your swing numbers above did not use this API — only the coaching text does. If the error
               mentions the model, set{" "}
-              <code className="rounded bg-amber-100/80 px-1 font-mono">ANTHROPIC_MODEL</code> in{" "}
-              <code className="rounded bg-amber-100/80 px-1 font-mono">.env.local</code> (see
+              <code className="rounded bg-[var(--pill-track)] px-1 font-mono">ANTHROPIC_MODEL</code> in{" "}
+              <code className="rounded bg-[var(--pill-track)] px-1 font-mono">.env.local</code> (see
               Anthropic&apos;s current model list), then restart{" "}
-              <code className="rounded bg-amber-100/80 px-1 font-mono">npm run dev</code>.
+              <code className="rounded bg-[var(--pill-track)] px-1 font-mono">npm run dev</code>.
             </p>
           </div>
         )}

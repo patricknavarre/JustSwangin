@@ -17,7 +17,8 @@ export function MobileNav() {
   const betting = path === "/betting-tracker";
   const clubAverages = path === "/club-averages";
   const strokesGained = path === "/strokes-gained";
-  const moreActive = betting || clubAverages || strokesGained || results;
+  const rangeFinder = path === "/range-finder";
+  const moreActive = betting || clubAverages || strokesGained || results || rangeFinder;
 
   return (
     <nav
@@ -157,6 +158,14 @@ export function MobileNav() {
                   }`}
                 >
                   Strokes Gained
+                </Link>
+                <Link
+                  href="/range-finder"
+                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
+                    rangeFinder ? "text-[var(--accent)]" : "text-[var(--text)]"
+                  }`}
+                >
+                  Range finder
                 </Link>
               </div>
             </div>

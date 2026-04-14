@@ -62,7 +62,7 @@ export function BatLabClient() {
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-xl sm:py-10">
       <div className="card overflow-hidden p-0">
-        <div className="relative bg-gradient-to-br from-sky-200 via-cyan-500 to-blue-900 px-6 py-9">
+        <div className="relative hero-water px-6 py-9">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">
             Baseball + Softball
           </p>

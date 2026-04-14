@@ -31,7 +31,7 @@ export function PhaseTimeline({ phases, durationMs }: Props) {
                 width: `${Math.max(w, 4)}%`,
                 background:
                   p.name === "impact"
-                    ? "linear-gradient(180deg, rgba(255,90,31,0.2), rgba(255,90,31,0.08))"
+                    ? "linear-gradient(180deg, rgba(45,90,27,0.22), rgba(45,90,27,0.08))"
                     : "transparent",
               }}
             >

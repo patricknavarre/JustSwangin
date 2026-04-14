@@ -29,7 +29,7 @@ const config: Config = {
       },
       boxShadow: {
         card: "0 4px 24px rgba(0, 0, 0, 0.07)",
-        fab: "0 6px 20px rgba(255, 90, 31, 0.45)",
+        fab: "0 6px 20px rgba(45, 90, 27, 0.42)",
       },
     },
   },

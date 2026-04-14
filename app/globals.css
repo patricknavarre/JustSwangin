@@ -3,23 +3,48 @@
 @tailwind utilities;
 
 :root {
-  --app-bg: #ebedf0;
-  --app-bg-deep: #e2e4e8;
-  --card: #ffffff;
-  --card-border: rgba(0, 0, 0, 0.06);
-  --text: #1c1c1e;
-  --text-secondary: #636366;
-  --section-label: #8e8e93;
-  --accent: #ff5a1f;
-  --accent-hover: #e64f18;
-  --accent-soft: rgba(255, 90, 31, 0.12);
-  --pill-track: #e5e5ea;
-  --nav-bg: #ffffff;
-  --good: #2d9d5f;
-  --warn: #c9a227;
-  --bad: #d4384c;
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.07);
-  --shadow-pill-active: 0 2px 12px rgba(0, 0, 0, 0.12);
+  /* Golf palette — Masters green drives brand / CTAs */
+  --masters-green: #2d5a1b;
+  --fairway: #3e7a26;
+  --putting-green: #6aab47;
+  --spring-turf: #c6e8a8;
+  --midnight-rough: #1a1f1a;
+  --deep-pine: #3d4438;
+  --clubhouse-cream: #f4f2ec;
+  --white: #ffffff;
+  --gold-pin: #c9a84c;
+  --water-hazard: #5b8fc9;
+  --red-flag: #c94040;
+  --morning-mist: #8b9e82;
+
+  --accent: var(--masters-green);
+  --accent-hover: var(--fairway);
+  --accent-soft: rgba(45, 90, 27, 0.14);
+  --accent-glow: rgba(45, 90, 27, 0.38);
+
+  --app-bg: var(--clubhouse-cream);
+  --app-bg-deep: #e9e5dc;
+  --card: var(--white);
+  --card-border: rgba(26, 31, 26, 0.07);
+  --text: var(--midnight-rough);
+  --text-secondary: #5a6156;
+  --section-label: #767d72;
+  --pill-track: #e0dcd3;
+
+  /* Top bar: Masters green + light type */
+  --header-bg: var(--masters-green);
+  --header-text: var(--white);
+  --header-text-muted: rgba(255, 255, 255, 0.82);
+  --header-border: rgba(255, 255, 255, 0.14);
+
+  /* Bottom mobile tab bar — light surface */
+  --nav-bg: var(--white);
+
+  --good: var(--putting-green);
+  --warn: var(--gold-pin);
+  --bad: var(--red-flag);
+  --shadow-card: 0 4px 24px rgba(26, 31, 26, 0.08);
+  --shadow-pill-active: 0 2px 12px rgba(26, 31, 26, 0.1);
 }
 
 html {
@@ -63,7 +88,7 @@ body {
 
 .btn-primary {
   @apply rounded-2xl bg-[var(--accent)] font-bold text-white shadow-md transition;
-  box-shadow: 0 4px 14px rgba(255, 90, 31, 0.35);
+  box-shadow: 0 4px 14px var(--accent-glow);
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
@@ -82,5 +107,20 @@ body {
   .px-safe {
     padding-left: max(1rem, env(safe-area-inset-left, 0px));
     padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
+  /** Full-width hero strips (Spring turf → Putting green → Masters) */
+  .hero-masters {
+    background: linear-gradient(
+      135deg,
+      var(--spring-turf) 0%,
+      var(--putting-green) 42%,
+      var(--masters-green) 100%
+    );
+  }
+
+  /** Alternate hero for baseball / water-themed flows */
+  .hero-water {
+    background: linear-gradient(135deg, #b8d4ef 0%, var(--water-hazard) 48%, #1a3550 100%);
   }
 }

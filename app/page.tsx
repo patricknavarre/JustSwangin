@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-2xl sm:py-10">
       <div className="card overflow-hidden p-0">
-        <div className="relative bg-gradient-to-br from-amber-200 via-orange-400 to-amber-900 px-6 py-10">
+        <div className="relative hero-masters px-6 py-10">
           <p className="section-heading !mb-0 !text-[10px] text-white/90">
             JustSwangin
           </p>
