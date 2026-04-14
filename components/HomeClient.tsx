@@ -76,10 +76,10 @@ export function HomeClient() {
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-xl sm:py-10">
       <div className="card overflow-hidden p-0">
-        <div className="relative hero-masters px-6 py-9">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">Swing</p>
-          <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Swing Lab</h1>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/85">
+        <div className="page-hero page-hero--pine">
+          <p className="page-hero-eyebrow">Swing</p>
+          <h1 className="font-display page-hero-title">Swing Lab</h1>
+          <p className="page-hero-lede max-w-sm">
             Upload a clip — we map your motion, score it against benchmarks, and build your coach
             report.
           </p>

@@ -261,10 +261,10 @@ export function RangeFinderClient() {
   return (
     <div className="mx-auto max-w-lg space-y-4 pb-2 pt-4 sm:max-w-2xl sm:pt-6">
       <div className="card overflow-hidden p-0">
-        <div className="hero-masters px-6 py-7">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/80">Course tools</p>
-          <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Range finder</h1>
-          <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/85">
+        <div className="page-hero page-hero--water">
+          <p className="page-hero-eyebrow">Course tools</p>
+          <h1 className="font-display page-hero-title">Range finder</h1>
+          <p className="page-hero-lede max-w-lg">
             Point your phone at the target and use GPS + a map pin for yardage. The camera is a sight picture;
             distance comes from your position to the pin. Elevation is sampled along that line (approximate DEM).
           </p>

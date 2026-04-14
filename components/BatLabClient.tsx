@@ -62,12 +62,10 @@ export function BatLabClient() {
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-xl sm:py-10">
       <div className="card overflow-hidden p-0">
-        <div className="relative hero-water px-6 py-9">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">
-            Baseball + Softball
-          </p>
-          <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Bat Lab</h1>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/85">
+        <div className="page-hero page-hero--water">
+          <p className="page-hero-eyebrow">Baseball + Softball</p>
+          <h1 className="font-display page-hero-title">Bat Lab</h1>
+          <p className="page-hero-lede max-w-sm">
             Upload your swing clip to map motion timing and get practical hitting coaching.
           </p>
         </div>

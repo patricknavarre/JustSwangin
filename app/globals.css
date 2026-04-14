@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Registered custom property — enables smooth color transitions on the accent rail */
+@property --hero-rail-color {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2d5a1b;
+}
+
 :root {
   /* Golf palette — Masters green drives brand / CTAs */
   --masters-green: #2d5a1b;
@@ -31,11 +38,16 @@
   --section-label: #767d72;
   --pill-track: #e0dcd3;
 
-  /* Top bar: Masters green + light type */
-  --header-bg: var(--masters-green);
-  --header-text: var(--white);
-  --header-text-muted: rgba(255, 255, 255, 0.82);
-  --header-border: rgba(255, 255, 255, 0.14);
+  /* Top bar: light surface + Red flag brand (readable on cream/white) */
+  --header-bg: var(--white);
+  --header-text: var(--red-flag);
+  --header-text-muted: var(--deep-pine);
+  --header-border: var(--card-border);
+
+  /* Featured bottom-nav FAB (range finder) */
+  --fab-feature: var(--red-flag);
+  --fab-feature-hover: #b03535;
+  --fab-feature-glow: rgba(201, 64, 64, 0.4);
 
   /* Bottom mobile tab bar — light surface */
   --nav-bg: var(--white);
@@ -45,12 +57,15 @@
   --bad: var(--red-flag);
   --shadow-card: 0 4px 24px rgba(26, 31, 26, 0.08);
   --shadow-pill-active: 0 2px 12px rgba(26, 31, 26, 0.1);
+
+  accent-color: var(--accent);
 }
 
 html {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  scroll-padding-top: calc(3.75rem + env(safe-area-inset-top, 0px));
 }
 
 body {
@@ -71,9 +86,20 @@ body {
 }
 
 .app-canvas {
-  background: linear-gradient(180deg, var(--app-bg) 0%, var(--app-bg-deep) 100%);
   min-height: 100dvh;
   min-height: -webkit-fill-available;
+  background-color: var(--app-bg);
+}
+
+@supports (background-color: color-mix(in oklch, white, black)) {
+  .app-canvas {
+    background-color: color-mix(in oklch, var(--clubhouse-cream) 97%, var(--deep-pine) 3%);
+  }
+}
+
+/* View Transitions API hook — pairs with document.startViewTransition when you add client nav */
+main {
+  view-transition-name: app-main;
 }
 
 .card {
@@ -97,6 +123,127 @@ body {
   @apply opacity-45 shadow-none;
 }
 
+/** Featured mobile nav FAB (range finder) */
+.nav-fab-feature {
+  background-color: var(--fab-feature);
+  box-shadow: 0 6px 20px var(--fab-feature-glow);
+}
+.nav-fab-feature:hover {
+  background-color: var(--fab-feature-hover);
+}
+
+/** Sticky site header — layered backdrop (no flat “plastic” bar) */
+.site-header {
+  background: color-mix(in srgb, var(--header-bg) 88%, transparent);
+  -webkit-backdrop-filter: saturate(1.65) blur(18px);
+  backdrop-filter: saturate(1.65) blur(18px);
+}
+
+@supports (background: color-mix(in oklch, white, transparent)) {
+  .site-header {
+    background: color-mix(in oklch, var(--header-bg) 90%, transparent);
+  }
+}
+
+details.site-menu > summary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--water-hazard) 65%, transparent);
+  outline-offset: 3px;
+  border-radius: 0.35rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  details.site-menu[open] > summary {
+    transition: opacity 0.2s ease;
+  }
+}
+
+/** Editorial page title block — flat surface, inset hairlines, accent rail (no hero gradients) */
+.page-hero {
+  container-type: inline-size;
+  container-name: pagehero;
+  position: relative;
+  padding: 2rem 1.5rem;
+  background-color: color-mix(in srgb, var(--card) 93%, var(--pill-track));
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.82),
+    inset 0 -1px 0 0 rgb(0 0 0 / 0.045);
+  transition: --hero-rail-color 0.5s ease;
+}
+
+@supports (background-color: color-mix(in oklch, white, black)) {
+  .page-hero {
+    background-color: color-mix(in oklch, var(--card) 97%, var(--pill-track));
+  }
+}
+
+.page-hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1rem;
+  bottom: 1rem;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background-color: var(--hero-rail-color);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .page-hero:hover {
+    --hero-rail-color: color-mix(in srgb, var(--hero-rail-color) 78%, white);
+  }
+}
+
+.page-hero--gold {
+  --hero-rail-color: var(--gold-pin);
+}
+.page-hero--water {
+  --hero-rail-color: var(--water-hazard);
+}
+.page-hero--mist {
+  --hero-rail-color: var(--morning-mist);
+}
+.page-hero--pine {
+  --hero-rail-color: var(--masters-green);
+}
+
+.page-hero-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--section-label);
+}
+
+.page-hero-title {
+  margin-top: 0.85rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: var(--text);
+  text-wrap: balance;
+  font-size: clamp(1.85rem, 12cqi + 0.5rem, 3.2rem);
+}
+
+.page-hero-lede {
+  margin-top: 0.85rem;
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+@supports (text-wrap: pretty) {
+  .page-hero-lede {
+    text-wrap: pretty;
+  }
+}
+
+@container pagehero (min-width: 32rem) {
+  .page-hero {
+    padding: 2.5rem 2.25rem;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -107,20 +254,5 @@ body {
   .px-safe {
     padding-left: max(1rem, env(safe-area-inset-left, 0px));
     padding-right: max(1rem, env(safe-area-inset-right, 0px));
-  }
-
-  /** Full-width hero strips (Spring turf → Putting green → Masters) */
-  .hero-masters {
-    background: linear-gradient(
-      135deg,
-      var(--spring-turf) 0%,
-      var(--putting-green) 42%,
-      var(--masters-green) 100%
-    );
-  }
-
-  /** Alternate hero for baseball / water-themed flows */
-  .hero-water {
-    background: linear-gradient(135deg, #b8d4ef 0%, var(--water-hazard) 48%, #1a3550 100%);
   }
 }

@@ -173,14 +173,12 @@ export function ScorecardClient() {
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-2xl sm:py-10">
       <div className="card overflow-hidden p-0">
-        <div className="hero-masters px-6 py-9">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">
-            Digital
-          </p>
-          <h1 className="font-display mt-1 text-3xl text-white sm:text-4xl">Scorecard</h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-white/90">
+        <div className="page-hero page-hero--water">
+          <p className="page-hero-eyebrow">Digital</p>
+          <h1 className="font-display page-hero-title">Scorecard</h1>
+          <p className="page-hero-lede max-w-md">
             Find nearby courses from your location and load a hole-by-hole scorecard with par and
-            yardage.             Includes NJ / PA and Pagosa Springs, CO scorecard data from our course guides — confirm
+            yardage. Includes NJ / PA and Pagosa Springs, CO scorecard data from our course guides — confirm
             yardages with the pro shop when in doubt.
           </p>
         </div>

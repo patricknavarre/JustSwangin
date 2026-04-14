@@ -18,7 +18,7 @@ export function MobileNav() {
   const clubAverages = path === "/club-averages";
   const strokesGained = path === "/strokes-gained";
   const rangeFinder = path === "/range-finder";
-  const moreActive = betting || clubAverages || strokesGained || results || rangeFinder;
+  const moreActive = betting || clubAverages || strokesGained || results || batLab;
 
   return (
     <nav
@@ -56,13 +56,33 @@ export function MobileNav() {
 
         <div className="relative flex flex-col items-center">
           <Link
-            href="/swing"
-            className={`flex h-[56px] w-[56px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-fab transition active:scale-95 active:opacity-90 ${
-              swing ? "ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--nav-bg)]" : ""
+            href="/range-finder"
+            className={`nav-fab-feature flex h-[56px] w-[56px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full text-white transition active:scale-95 active:opacity-90 ${
+              rangeFinder ? "ring-2 ring-[var(--fab-feature)] ring-offset-2 ring-offset-[var(--nav-bg)]" : ""
             }`}
-            aria-label="Start swing analysis"
+            aria-label="Open range finder"
           >
             <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+              <path
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                d="M12 5v2M12 17v2M5 12h2M17 12h2"
+              />
+            </svg>
+          </Link>
+          <span className="mt-2 text-[11px] font-semibold text-[var(--section-label)]">Range</span>
+        </div>
+
+        <Link
+          href="/swing"
+          className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
+            swing ? "text-[var(--text)]" : "text-[var(--section-label)]"
+          }`}
+        >
+          <NavIcon>
+            <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path
                 stroke="currentColor"
                 strokeWidth="1.75"
@@ -71,38 +91,12 @@ export function MobileNav() {
               />
               <circle cx="12" cy="8" r="3.25" fill="currentColor" stroke="none" />
             </svg>
-          </Link>
-          <span className="mt-2 text-[11px] font-semibold text-[var(--section-label)]">Swing</span>
-        </div>
-
-        <Link
-          href="/bat-lab"
-          className={`flex min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
-            batLab ? "text-[var(--text)]" : "text-[var(--section-label)]"
-          }`}
-        >
-          <NavIcon>
-            <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M15 3l6 6-8.5 8.5a3 3 0 11-4.24-4.24L16.76 4.76 15 3z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M4 20l2.2-2.2"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
           </NavIcon>
-          Bat Lab
+          Swing
         </Link>
 
         <div className="relative">
-          <details className="group">
+          <details className="site-menu group">
             <summary
               className={`flex cursor-pointer min-h-[48px] min-w-[56px] flex-col items-center justify-end pb-2 text-[11px] font-semibold active:opacity-70 ${
                 moreActive ? "text-[var(--text)]" : "text-[var(--section-label)]"
@@ -127,6 +121,14 @@ export function MobileNav() {
             </summary>
             <div className="absolute bottom-[4.25rem] right-0 w-56 rounded-2xl border border-black/[0.08] bg-white p-2 shadow-card">
               <div className="flex flex-col gap-1">
+                <Link
+                  href="/bat-lab"
+                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
+                    batLab ? "text-[var(--water-hazard)]" : "text-[var(--text)]"
+                  }`}
+                >
+                  Bat Lab
+                </Link>
                 <Link
                   href="/analyze"
                   className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
@@ -158,14 +160,6 @@ export function MobileNav() {
                   }`}
                 >
                   Strokes Gained
-                </Link>
-                <Link
-                  href="/range-finder"
-                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
-                    rangeFinder ? "text-[var(--accent)]" : "text-[var(--text)]"
-                  }`}
-                >
-                  Range finder
                 </Link>
               </div>
             </div>

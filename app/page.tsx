@@ -5,14 +5,10 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-lg space-y-8 py-8 sm:max-w-2xl sm:py-10">
       <div className="card overflow-hidden p-0">
-        <div className="relative hero-masters px-6 py-10">
-          <p className="section-heading !mb-0 !text-[10px] text-white/90">
-            JustSwangin
-          </p>
-          <h1 className="font-display mt-3 text-4xl text-white sm:text-5xl">
-            Luxury-grade swing analysis
-          </h1>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/85">
+        <div className="page-hero page-hero--pine">
+          <p className="page-hero-eyebrow">JustSwangin</p>
+          <h1 className="font-display page-hero-title">Luxury-grade swing analysis</h1>
+          <p className="page-hero-lede max-w-sm">
             Pose mapping + research benchmarks + Claude coaching. Built to feel private club,
             not clinical.
           </p>
