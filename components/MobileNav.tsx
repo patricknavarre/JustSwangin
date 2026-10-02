@@ -23,7 +23,9 @@ export function MobileNav() {
   const clubAverages = path === "/club-averages";
   const strokesGained = path === "/strokes-gained";
   const rangeFinder = path === "/range-finder";
-  const moreActive = betting || clubAverages || strokesGained || results || batLab;
+  const clubFitting = path === "/club-fitting";
+  const moreActive =
+    betting || clubAverages || strokesGained || results || batLab || clubFitting;
 
   return (
     <nav
@@ -161,6 +163,15 @@ export function MobileNav() {
                   }`}
                 >
                   Club Averages
+                </NavLink>
+                <NavLink
+                  href="/club-fitting"
+                  onClick={closeMobileMoreMenu}
+                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-[var(--accent-soft)] ${
+                    clubFitting ? "text-[var(--accent)]" : "text-[var(--text)]"
+                  }`}
+                >
+                  Club fitting
                 </NavLink>
                 <NavLink
                   href="/strokes-gained"

@@ -135,13 +135,33 @@ export default function Home() {
       </div>
 
       <div className="card">
+        <h2 className="section-heading">Club fitting</h2>
+        <p className="font-display mt-2 text-2xl text-[var(--text)]">
+          Specs and example models from your swing
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+          After Swing Lab, open Club fitting for shaft flex / weight bands, loft and launch windows,
+          head bias, and illustrative brand/model examples — stronger when you attach launch-monitor
+          data.
+        </p>
+        <div className="mt-5">
+          <NavLink
+            href="/club-fitting"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open club fitting
+          </NavLink>
+        </div>
+      </div>
+
+      <div className="card">
         <h2 className="section-heading">Priority Features</h2>
         <p className="font-display mt-2 text-2xl text-[var(--text)]">
           Build your friend-group favorites
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
-          Four utility flows for weekends: on-course range finder, betting, club distances from
-          launch-monitor CSVs, and a lightweight strokes gained calculator.
+          Weekend utilities: range finder, club fitting, betting, club distances from launch-monitor
+          CSVs, and a lightweight strokes gained calculator.
         </p>
 
         <div className="mt-5 space-y-3">
@@ -150,6 +170,12 @@ export default function Home() {
             className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
           >
             Open range finder
+          </NavLink>
+          <NavLink
+            href="/club-fitting"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open club fitting
           </NavLink>
           <Link
             href="/betting-tracker"

@@ -138,6 +138,26 @@ export function AnalyzePageClient() {
         {coaching && !loadingCoach && <CoachingReport data={coaching} />}
       </section>
 
+      <div className="card">
+        <h2 className="section-heading">Club fitting</h2>
+        <p className="font-display mt-2 text-xl text-[var(--text)]">
+          Spec bands from this swing
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+          Get shaft flex / weight, loft and launch windows, head bias, and example models from your
+          metrics{data.launchData?.length ? " and launch-monitor session" : ""} — educational
+          starting points for a real fitting.
+        </p>
+        <div className="mt-5">
+          <Link
+            href="/club-fitting"
+            className="btn-primary inline-flex min-h-[48px] items-center justify-center rounded-2xl px-6 py-3 text-sm font-bold"
+          >
+            Get club fitting recommendations
+          </Link>
+        </div>
+      </div>
+
       <footer className="border-t border-black/[0.06] pt-8 text-center text-[11px] leading-relaxed text-[var(--section-label)]">
         Pose is processed in your browser. Cloud uploads follow your provider&apos;s policy.
         JustSwangin only sends metrics (and optional launch data) to the AI coach for your report.

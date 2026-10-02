@@ -48,6 +48,13 @@ export function SiteHeader() {
               >
                 Range finder
               </NavLink>
+              <NavLink
+                href="/club-fitting"
+                onClick={closeHeaderMenu}
+                className="rounded-xl px-3 py-2 text-sm font-semibold text-[var(--text)] transition hover:bg-[var(--pill-track)]"
+              >
+                Club fitting
+              </NavLink>
               <div className="my-1 border-t border-black/[0.06]" />
               <NavLink
                 href="/betting-tracker"
