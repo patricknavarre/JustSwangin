@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ScorecardTable } from "@/components/ScorecardTable";
+import { CaddyModePanel } from "@/components/CaddyModePanel";
 import type {
   CourseScorecard,
   NearbyCourseSuggestion,
@@ -289,6 +290,8 @@ export function ScorecardClient() {
           }}
         />
       )}
+
+      {selectedCourse && !loadingScorecard && <CaddyModePanel course={selectedCourse} />}
 
       {selectedCourse && !loadingScorecard && (
         <div className="card">
