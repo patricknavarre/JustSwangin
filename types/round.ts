@@ -1,5 +1,12 @@
 export type RoundId = string;
 
+export interface ScorecardPlayer {
+  id: string;
+  name: string;
+  /** 0-based index by holeNumber-1; null = not yet entered */
+  holeScoresStrokes: Array<number | null>;
+}
+
 export interface SavedRound {
   id: RoundId;
   createdAtISO: string;
@@ -11,11 +18,17 @@ export interface SavedRound {
   teeId: string;
   teeName: string;
 
-  /** 0-based index by holeNumber-1; null = not yet entered */
+  /**
+   * Primary player strokes (player index 0). Kept for backward compatibility
+   * with Betting Tracker and older rounds.
+   */
   holeScoresStrokes: Array<number | null>;
 
+  /** All players on this card (includes primary). Optional on older saves. */
+  players?: ScorecardPlayer[];
+
   totalPar: number;
-  /** Sum of entered strokes only (null holes ignored). */
+  /** Sum of entered strokes for the primary player (null holes ignored). */
   totalStrokes: number;
   netToPar: number;
   /** True while the round is still being filled in on the scorecard. */

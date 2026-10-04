@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ScorecardTable } from "@/components/ScorecardTable";
+import { ScorecardPlayersPanel } from "@/components/ScorecardPlayersPanel";
 import { CaddyModePanel } from "@/components/CaddyModePanel";
 import type {
   CourseScorecard,
   NearbyCourseSuggestion,
   ScorecardCourseSummary,
 } from "@/types/scorecard";
-import type { SavedRound } from "@/types/round";
+import type { SavedRound, ScorecardPlayer } from "@/types/round";
 import {
   computeRoundTotals,
   loadRoundsLocal,
@@ -21,6 +22,16 @@ import {
   loadScorecardSession,
   saveScorecardSession,
 } from "@/lib/rounds/session";
+import {
+  MAX_SCORECARD_PLAYERS,
+  allPlayersComplete,
+  anyScoresEntered,
+  countEnteredHoles,
+  createPlayer,
+  defaultPlayers,
+  padPlayerScores,
+  playersFromRound,
+} from "@/lib/rounds/players";
 
 type NearbyResponse = {
   courses: NearbyCourseSuggestion[];
@@ -32,10 +43,6 @@ type CoursesResponse = {
   courses: ScorecardCourseSummary[];
 };
 
-function emptyScores(holeCount: number): Array<number | null> {
-  return new Array(holeCount).fill(null);
-}
-
 export function ScorecardClient() {
   const [knownCourses, setKnownCourses] = useState<ScorecardCourseSummary[]>([]);
   const [nearbyCourses, setNearbyCourses] = useState<NearbyCourseSuggestion[]>([]);
@@ -44,7 +51,7 @@ export function ScorecardClient() {
   const [selectedTeeId, setSelectedTeeId] = useState<string>("");
   const [savedRounds, setSavedRounds] = useState<SavedRound[]>([]);
   const [activeRoundId, setActiveRoundId] = useState<string | null>(null);
-  const [holeScoresStrokes, setHoleScoresStrokes] = useState<Array<number | null>>([]);
+  const [players, setPlayers] = useState<ScorecardPlayer[]>([]);
   const [loadingNearby, setLoadingNearby] = useState(false);
   const [loadingScorecard, setLoadingScorecard] = useState(false);
   const [nearbySource, setNearbySource] = useState<string | null>(null);
@@ -58,6 +65,8 @@ export function ScorecardClient() {
 
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipNextTeeReset = useRef(false);
+  const activeRoundIdRef = useRef(activeRoundId);
+  activeRoundIdRef.current = activeRoundId;
 
   useEffect(() => {
     void fetchKnownCourses();
@@ -71,8 +80,10 @@ export function ScorecardClient() {
       setSelectedCourseId(session.courseId);
       setSelectedTeeId(session.teeId);
       setActiveRoundId(session.activeRoundId);
-      setHoleScoresStrokes(session.holeScoresStrokes ?? []);
+      setPlayers(session.players?.length ? session.players : defaultPlayers(18));
       skipNextTeeReset.current = true;
+    } else {
+      setPlayers(defaultPlayers(18));
     }
     setSessionHydrated(true);
   }, []);
@@ -89,30 +100,28 @@ export function ScorecardClient() {
     (opts: {
       course: CourseScorecard;
       teeId: string;
-      scores: Array<number | null>;
+      players: ScorecardPlayer[];
       roundId: string | null;
       inProgress?: boolean;
     }) => {
-      const { course, teeId, scores, roundId } = opts;
+      const { course, teeId, roundId } = opts;
       const tee = course.tees.find((t) => t.teeId === teeId);
       const totalPar = course.holes.reduce((sum, h) => sum + h.par, 0);
-      const padded =
-        scores.length === course.holes.length
-          ? scores
-          : emptyScores(course.holes.length).map((_, i) => scores[i] ?? null);
-      const { totalStrokes, netToPar, holesEntered } = computeRoundTotals(padded, totalPar);
-      const inProgress =
-        opts.inProgress ?? holesEntered < course.holes.length;
+      const padded = padPlayerScores(opts.players, course.holes.length);
+      const primary = padded[0]!;
+      const { totalStrokes, netToPar } = computeRoundTotals(primary.holeScoresStrokes, totalPar);
+      const holesEntered = Math.max(...padded.map((p) => countEnteredHoles(p.holeScoresStrokes)), 0);
+      const inProgress = opts.inProgress ?? !allPlayersComplete(padded, course.holes.length);
 
       saveScorecardSession({
         courseId: course.courseId,
         teeId,
         activeRoundId: roundId,
-        holeScoresStrokes: padded,
+        players: padded,
       });
 
-      if (holesEntered === 0 && !roundId) {
-        setSaveHint("Select a course and enter scores — they save automatically.");
+      if (!anyScoresEntered(padded) && !roundId) {
+        setSaveHint("Add players and enter scores — they save automatically.");
         return roundId;
       }
 
@@ -125,7 +134,8 @@ export function ScorecardClient() {
         country: course.country,
         teeId,
         teeName: tee?.name ?? teeId,
-        holeScoresStrokes: padded,
+        holeScoresStrokes: primary.holeScoresStrokes,
+        players: padded,
         totalPar,
         totalStrokes,
         netToPar,
@@ -138,12 +148,14 @@ export function ScorecardClient() {
           courseId: course.courseId,
           teeId,
           activeRoundId: id,
-          holeScoresStrokes: padded,
+          players: padded,
         });
         setSavedRounds(sortRoundsNewestFirst(loadRoundsLocal()));
         setSaveHint(
           inProgress
-            ? `Autosaved (${holesEntered}/${course.holes.length} holes)`
+            ? `Autosaved (${holesEntered}/${course.holes.length} holes · ${padded.length} player${
+                padded.length === 1 ? "" : "s"
+              })`
             : "Round saved",
         );
       }
@@ -156,12 +168,12 @@ export function ScorecardClient() {
     (
       course: CourseScorecard,
       teeId: string,
-      scores: Array<number | null>,
+      nextPlayers: ScorecardPlayer[],
       roundId: string | null,
     ) => {
       if (persistTimer.current) clearTimeout(persistTimer.current);
       persistTimer.current = setTimeout(() => {
-        persistEverything({ course, teeId, scores, roundId });
+        persistEverything({ course, teeId, players: nextPlayers, roundId });
       }, 250);
     },
     [persistEverything],
@@ -184,6 +196,14 @@ export function ScorecardClient() {
     }
   }
 
+  function applyPlayersFromRound(course: CourseScorecard, round: SavedRound) {
+    return playersFromRound(
+      round.holeScoresStrokes,
+      round.players,
+      course.holes.length,
+    );
+  }
+
   async function fetchScorecard(courseId: string) {
     setLoadingScorecard(true);
     setError(null);
@@ -197,30 +217,18 @@ export function ScorecardClient() {
       const course = json.course;
       setSelectedCourse(course);
 
-      const session = loadScorecardSession();
+      const session = loadScorecardSession(course.holes.length);
       const sameCourse = session?.courseId === course.courseId;
       const teeFromSession =
         sameCourse && course.tees.some((t) => t.teeId === session.teeId)
           ? session.teeId
           : null;
 
-      if (skipNextTeeReset.current && teeFromSession) {
+      if ((skipNextTeeReset.current || sameCourse) && teeFromSession && session) {
         setSelectedTeeId(teeFromSession);
-        const scores =
-          session!.holeScoresStrokes?.length === course.holes.length
-            ? session!.holeScoresStrokes
-            : emptyScores(course.holes.length);
-        setHoleScoresStrokes(scores);
-        setActiveRoundId(session!.activeRoundId);
+        setPlayers(padPlayerScores(session.players, course.holes.length));
+        setActiveRoundId(session.activeRoundId);
         skipNextTeeReset.current = false;
-      } else if (sameCourse && teeFromSession) {
-        setSelectedTeeId(teeFromSession);
-        const scores =
-          session!.holeScoresStrokes?.length === course.holes.length
-            ? session!.holeScoresStrokes
-            : emptyScores(course.holes.length);
-        setHoleScoresStrokes(scores);
-        setActiveRoundId(session!.activeRoundId);
       } else {
         const teeId = course.tees[0]?.teeId ?? "";
         setSelectedTeeId(teeId);
@@ -229,16 +237,10 @@ export function ScorecardClient() {
           (r) => r.courseId === course.courseId && r.teeId === teeId && r.inProgress !== false,
         );
         if (latest) {
-          const next = emptyScores(course.holes.length);
-          for (const hole of course.holes) {
-            const idx = hole.holeNumber - 1;
-            const v = latest.holeScoresStrokes[idx];
-            if (typeof v === "number" && Number.isFinite(v)) next[idx] = v;
-          }
-          setHoleScoresStrokes(next);
+          setPlayers(applyPlayersFromRound(course, latest));
           setActiveRoundId(latest.id);
         } else {
-          setHoleScoresStrokes(emptyScores(course.holes.length));
+          setPlayers(defaultPlayers(course.holes.length));
           setActiveRoundId(null);
         }
       }
@@ -257,39 +259,66 @@ export function ScorecardClient() {
     const latest = sortRoundsNewestFirst(rounds).find(
       (r) => r.courseId === selectedCourse.courseId && r.teeId === teeId,
     );
-    const scores = emptyScores(selectedCourse.holes.length);
+    let nextPlayers = defaultPlayers(selectedCourse.holes.length);
     let roundId: string | null = null;
     if (latest) {
-      for (const hole of selectedCourse.holes) {
-        const idx = hole.holeNumber - 1;
-        const v = latest.holeScoresStrokes[idx];
-        if (typeof v === "number" && Number.isFinite(v)) scores[idx] = v;
-      }
+      nextPlayers = applyPlayersFromRound(selectedCourse, latest);
       roundId = latest.id;
     }
-    setHoleScoresStrokes(scores);
+    setPlayers(nextPlayers);
     setActiveRoundId(roundId);
-    schedulePersist(selectedCourse, teeId, scores, roundId);
+    schedulePersist(selectedCourse, teeId, nextPlayers, roundId);
   }
 
-  function onHoleScoreChange(holeNumber: number, strokes: number | null) {
+  function onHoleScoreChange(playerId: string, holeNumber: number, strokes: number | null) {
     if (!selectedCourse || !selectedTeeId) return;
-    setHoleScoresStrokes((prev) => {
-      const next =
-        prev.length === selectedCourse.holes.length
-          ? [...prev]
-          : emptyScores(selectedCourse.holes.length);
-      next[holeNumber - 1] = strokes;
-      schedulePersist(selectedCourse, selectedTeeId, next, activeRoundId);
+    setPlayers((prev) => {
+      const next = padPlayerScores(prev, selectedCourse.holes.length).map((p) => {
+        if (p.id !== playerId) return p;
+        const scores = [...p.holeScoresStrokes];
+        scores[holeNumber - 1] = strokes;
+        return { ...p, holeScoresStrokes: scores };
+      });
+      schedulePersist(selectedCourse, selectedTeeId, next, activeRoundIdRef.current);
       return next;
     });
     setError(null);
   }
 
+  function onAddPlayer() {
+    if (!selectedCourse || !selectedTeeId) return;
+    if (players.length >= MAX_SCORECARD_PLAYERS) return;
+    const next = [
+      ...padPlayerScores(players, selectedCourse.holes.length),
+      createPlayer(`Player ${players.length + 1}`, selectedCourse.holes.length),
+    ];
+    setPlayers(next);
+    schedulePersist(selectedCourse, selectedTeeId, next, activeRoundId);
+  }
+
+  function onRenamePlayer(playerId: string, name: string) {
+    if (!selectedCourse || !selectedTeeId) return;
+    const next = players.map((p) => (p.id === playerId ? { ...p, name } : p));
+    setPlayers(next);
+    schedulePersist(selectedCourse, selectedTeeId, next, activeRoundId);
+  }
+
+  function onRemovePlayer(playerId: string) {
+    if (!selectedCourse || !selectedTeeId) return;
+    if (players.length <= 1) return;
+    const next = players.filter((p) => p.id !== playerId);
+    setPlayers(next);
+    schedulePersist(selectedCourse, selectedTeeId, next, activeRoundId);
+  }
+
   function startNewRound() {
     if (!selectedCourse || !selectedTeeId) return;
-    const scores = emptyScores(selectedCourse.holes.length);
-    setHoleScoresStrokes(scores);
+    const names = players.map((p) => p.name);
+    const next =
+      names.length > 0
+        ? names.map((name) => createPlayer(name, selectedCourse.holes.length))
+        : defaultPlayers(selectedCourse.holes.length);
+    setPlayers(next);
     setActiveRoundId(null);
     setError(null);
     setSaveHint("New round started — scores autosave as you enter them.");
@@ -297,23 +326,21 @@ export function ScorecardClient() {
       courseId: selectedCourse.courseId,
       teeId: selectedTeeId,
       activeRoundId: null,
-      holeScoresStrokes: scores,
+      players: next,
     });
   }
 
   function finalizeRound() {
     if (!selectedCourse || !selectedTeeId) return;
-    const filled = holeScoresStrokes.every(
-      (v) => typeof v === "number" && Number.isFinite(v) && v >= 0,
-    );
-    if (!filled) {
-      setError("Enter strokes for every hole before marking the round complete.");
+    const padded = padPlayerScores(players, selectedCourse.holes.length);
+    if (!allPlayersComplete(padded, selectedCourse.holes.length)) {
+      setError("Enter strokes for every hole for every player before marking complete.");
       return;
     }
     persistEverything({
       course: selectedCourse,
       teeId: selectedTeeId,
-      scores: holeScoresStrokes,
+      players: padded,
       roundId: activeRoundId,
       inProgress: false,
     });
@@ -390,8 +417,8 @@ export function ScorecardClient() {
           <p className="page-hero-eyebrow">Digital</p>
           <h1 className="font-display page-hero-title">Scorecard</h1>
           <p className="page-hero-lede max-w-md">
-            Find nearby courses from your location and load a hole-by-hole scorecard with par and
-            yardage. Scores and course selection autosave on this device when you navigate away.
+            Track a group round hole-by-hole. Course, players, and scores autosave on this device
+            when you navigate away.
           </p>
         </div>
       </div>
@@ -480,7 +507,7 @@ export function ScorecardClient() {
               if (!id) {
                 clearScorecardSession();
                 setSelectedCourse(null);
-                setHoleScoresStrokes([]);
+                setPlayers(defaultPlayers(18));
                 setActiveRoundId(null);
               }
             }}
@@ -497,7 +524,7 @@ export function ScorecardClient() {
           <p className="mt-3 text-xs text-[var(--good)]">{saveHint}</p>
         ) : (
           <p className="mt-3 text-xs text-[var(--text-secondary)]">
-            Hole scores autosave on this device as you type.
+            Hole scores and players autosave on this device.
           </p>
         )}
       </section>
@@ -509,11 +536,20 @@ export function ScorecardClient() {
       )}
 
       {selectedCourse && !loadingScorecard && (
+        <ScorecardPlayersPanel
+          players={players}
+          onAddPlayer={onAddPlayer}
+          onRenamePlayer={onRenamePlayer}
+          onRemovePlayer={onRemovePlayer}
+        />
+      )}
+
+      {selectedCourse && !loadingScorecard && players.length > 0 && (
         <ScorecardTable
           course={selectedCourse}
           teeId={selectedTeeId}
           onTeeChange={onTeeChange}
-          holeScoresStrokes={holeScoresStrokes}
+          players={players}
           onHoleScoresStrokesChange={onHoleScoreChange}
         />
       )}
@@ -524,8 +560,8 @@ export function ScorecardClient() {
         <div className="card">
           <h2 className="section-heading">Round</h2>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Your current card is kept when you leave this page. Mark complete when every hole is
-            filled, or start a fresh card anytime.
+            Your current card (including all players) is kept when you leave this page. Mark
+            complete when every hole is filled for every player, or start a fresh card anytime.
           </p>
           <div className="mt-4 flex flex-col gap-3">
             <button
@@ -557,19 +593,15 @@ export function ScorecardClient() {
             <div className="mt-2 space-y-3">
               {courseRounds.map((r) => {
                 const scoreLabel = r.netToPar <= 0 ? `${r.netToPar}` : `+${r.netToPar}`;
+                const playerCount = r.players?.length ?? 1;
                 return (
                   <button
                     type="button"
                     key={r.id}
                     onClick={() => {
-                      const next = emptyScores(selectedCourse.holes.length);
-                      for (const hole of selectedCourse.holes) {
-                        const idx = hole.holeNumber - 1;
-                        const v = r.holeScoresStrokes[idx];
-                        if (typeof v === "number" && Number.isFinite(v)) next[idx] = v;
-                      }
+                      const next = applyPlayersFromRound(selectedCourse, r);
                       setActiveRoundId(r.id);
-                      setHoleScoresStrokes(next);
+                      setPlayers(next);
                       setError(null);
                       schedulePersist(selectedCourse, selectedTeeId, next, r.id);
                     }}
@@ -590,7 +622,10 @@ export function ScorecardClient() {
                             </span>
                           ) : null}
                         </p>
-                        <p className="mt-1 text-xs text-[var(--text-secondary)]">{r.teeName}</p>
+                        <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                          {r.teeName}
+                          {playerCount > 1 ? ` · ${playerCount} players` : ""}
+                        </p>
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-[var(--text)]">
@@ -598,6 +633,7 @@ export function ScorecardClient() {
                         </p>
                         <p className="mt-1 text-xs font-semibold text-[var(--accent)]">
                           {scoreLabel} to par
+                          {playerCount > 1 ? " (You)" : ""}
                         </p>
                       </div>
                     </div>
