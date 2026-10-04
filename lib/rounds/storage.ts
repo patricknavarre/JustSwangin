@@ -8,7 +8,6 @@ function nowISO() {
 }
 
 function makeId(): RoundId {
-  // Prefer crypto if available (browser + modern node). Fallback is fine for local-only.
   const maybeCrypto = globalThis as unknown as {
     crypto?: { randomUUID?: () => string };
   };
@@ -16,36 +15,6 @@ function makeId(): RoundId {
     return maybeCrypto.crypto.randomUUID() as RoundId;
   }
   return `r_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-}
-
-export function saveRoundLocal(
-  roundInput: Omit<SavedRound, "id" | "createdAtISO">,
-): RoundId | null {
-  const id = makeId();
-  const createdAtISO = nowISO();
-
-  const next: SavedRound = { id, createdAtISO, ...roundInput };
-  if (typeof window === "undefined") return null;
-
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  const existing = raw ? (safeParse<SavedRound[]>(raw) ?? []) : [];
-
-  const merged = [next, ...existing].slice(0, MAX_ROUNDS);
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-
-  return id;
-}
-
-export function loadRoundsLocal(): SavedRound[] {
-  if (typeof window === "undefined") return [];
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
-  return safeParse<SavedRound[]>(raw) ?? [];
-}
-
-export function clearRoundsLocal() {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(STORAGE_KEY);
 }
 
 function safeParse<T>(raw: string): T | null {
@@ -56,8 +25,96 @@ function safeParse<T>(raw: string): T | null {
   }
 }
 
+function readAll(): SavedRound[] {
+  if (typeof window === "undefined") return [];
+  const raw = window.localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
+  return safeParse<SavedRound[]>(raw) ?? [];
+}
+
+function writeAll(rounds: SavedRound[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(rounds.slice(0, MAX_ROUNDS)));
+}
+
+export function computeRoundTotals(
+  holeScoresStrokes: Array<number | null>,
+  totalPar: number,
+): { totalStrokes: number; netToPar: number; holesEntered: number } {
+  let totalStrokes = 0;
+  let holesEntered = 0;
+  for (const v of holeScoresStrokes) {
+    if (typeof v === "number" && Number.isFinite(v) && v >= 0) {
+      totalStrokes += v;
+      holesEntered += 1;
+    }
+  }
+  return {
+    totalStrokes,
+    netToPar: totalStrokes - totalPar,
+    holesEntered,
+  };
+}
+
+export function saveRoundLocal(
+  roundInput: Omit<SavedRound, "id" | "createdAtISO">,
+): RoundId | null {
+  if (typeof window === "undefined") return null;
+  const id = makeId();
+  const createdAtISO = nowISO();
+  const next: SavedRound = {
+    id,
+    createdAtISO,
+    updatedAtISO: createdAtISO,
+    ...roundInput,
+  };
+  writeAll([next, ...readAll()]);
+  return id;
+}
+
+export function updateRoundLocal(
+  id: RoundId,
+  patch: Partial<Omit<SavedRound, "id" | "createdAtISO">>,
+): boolean {
+  if (typeof window === "undefined") return false;
+  const existing = readAll();
+  const idx = existing.findIndex((r) => r.id === id);
+  if (idx < 0) return false;
+  const prev = existing[idx]!;
+  existing[idx] = {
+    ...prev,
+    ...patch,
+    updatedAtISO: nowISO(),
+  };
+  writeAll(existing);
+  return true;
+}
+
+/** Create or update a round by id (creates when id is null / missing). */
+export function upsertRoundLocal(
+  roundInput: Omit<SavedRound, "id" | "createdAtISO"> & { id?: RoundId | null },
+): RoundId | null {
+  if (typeof window === "undefined") return null;
+  const { id: maybeId, ...rest } = roundInput;
+  if (maybeId && updateRoundLocal(maybeId, rest)) return maybeId;
+  return saveRoundLocal(rest);
+}
+
+export function loadRoundsLocal(): SavedRound[] {
+  return readAll();
+}
+
+export function clearRoundsLocal() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(STORAGE_KEY);
+}
+
 export function sortRoundsNewestFirst(rounds: SavedRound[]): SavedRound[] {
-  return [...rounds].sort((a, b) => (a.createdAtISO < b.createdAtISO ? 1 : -1));
+  return [...rounds].sort((a, b) => {
+    const aKey = a.updatedAtISO ?? a.createdAtISO;
+    const bKey = b.updatedAtISO ?? b.createdAtISO;
+    return aKey < bKey ? 1 : -1;
+  });
 }
 
 export function formatDateShort(iso: string): string {
