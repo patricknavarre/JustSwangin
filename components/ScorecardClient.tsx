@@ -12,6 +12,7 @@ import type {
 import type { SavedRound, ScorecardPlayer } from "@/types/round";
 import {
   computeRoundTotals,
+  deleteRoundLocal,
   loadRoundsLocal,
   sortRoundsNewestFirst,
   formatDateShort,
@@ -311,13 +312,20 @@ export function ScorecardClient() {
     schedulePersist(selectedCourse, selectedTeeId, next, activeRoundId);
   }
 
+  function blankPlayersKeepingNames() {
+    if (!selectedCourse) return defaultPlayers(18);
+    const names = players.map((p) => p.name);
+    if (names.length === 0) return defaultPlayers(selectedCourse.holes.length);
+    return names.map((name) => createPlayer(name, selectedCourse.holes.length));
+  }
+
   function startNewRound() {
     if (!selectedCourse || !selectedTeeId) return;
-    const names = players.map((p) => p.name);
-    const next =
-      names.length > 0
-        ? names.map((name) => createPlayer(name, selectedCourse.holes.length))
-        : defaultPlayers(selectedCourse.holes.length);
+    if (persistTimer.current) {
+      clearTimeout(persistTimer.current);
+      persistTimer.current = null;
+    }
+    const next = blankPlayersKeepingNames();
     setPlayers(next);
     setActiveRoundId(null);
     setError(null);
@@ -328,6 +336,62 @@ export function ScorecardClient() {
       activeRoundId: null,
       players: next,
     });
+  }
+
+  function discardActiveRound() {
+    if (!selectedCourse || !selectedTeeId) return;
+    const hasWork = Boolean(activeRoundId) || anyScoresEntered(players);
+    if (!hasWork) return;
+    if (
+      !window.confirm(
+        "Discard this round? Scores will be deleted from this device and cannot be undone.",
+      )
+    ) {
+      return;
+    }
+    if (persistTimer.current) {
+      clearTimeout(persistTimer.current);
+      persistTimer.current = null;
+    }
+    if (activeRoundId) deleteRoundLocal(activeRoundId);
+    const next = blankPlayersKeepingNames();
+    setPlayers(next);
+    setActiveRoundId(null);
+    setSavedRounds(sortRoundsNewestFirst(loadRoundsLocal()));
+    setError(null);
+    setSaveHint("Round discarded.");
+    saveScorecardSession({
+      courseId: selectedCourse.courseId,
+      teeId: selectedTeeId,
+      activeRoundId: null,
+      players: next,
+    });
+  }
+
+  function deleteSavedRound(roundId: string) {
+    if (!selectedCourse || !selectedTeeId) return;
+    if (!window.confirm("Delete this round from this device? This cannot be undone.")) {
+      return;
+    }
+    if (persistTimer.current && activeRoundId === roundId) {
+      clearTimeout(persistTimer.current);
+      persistTimer.current = null;
+    }
+    deleteRoundLocal(roundId);
+    setSavedRounds(sortRoundsNewestFirst(loadRoundsLocal()));
+    if (activeRoundId === roundId) {
+      const next = blankPlayersKeepingNames();
+      setPlayers(next);
+      setActiveRoundId(null);
+      setSaveHint("Round deleted.");
+      saveScorecardSession({
+        courseId: selectedCourse.courseId,
+        teeId: selectedTeeId,
+        activeRoundId: null,
+        players: next,
+      });
+    }
+    setError(null);
   }
 
   function finalizeRound() {
@@ -561,7 +625,7 @@ export function ScorecardClient() {
           <h2 className="section-heading">Round</h2>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
             Your current card (including all players) is kept when you leave this page. Mark
-            complete when every hole is filled for every player, or start a fresh card anytime.
+            complete when every hole is filled for every player, or discard / start fresh anytime.
           </p>
           <div className="mt-4 flex flex-col gap-3">
             <button
@@ -578,6 +642,15 @@ export function ScorecardClient() {
             >
               Start new round
             </button>
+            {(activeRoundId || anyScoresEntered(players)) && (
+              <button
+                type="button"
+                onClick={discardActiveRound}
+                className="rounded-2xl border border-[var(--bad)]/25 bg-white px-6 py-4 text-sm font-semibold text-[var(--bad)] transition hover:bg-red-50"
+              >
+                Discard round
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -594,50 +667,64 @@ export function ScorecardClient() {
               {courseRounds.map((r) => {
                 const scoreLabel = r.netToPar <= 0 ? `${r.netToPar}` : `+${r.netToPar}`;
                 const playerCount = r.players?.length ?? 1;
+                const inProgress =
+                  r.inProgress !== false && r.holeScoresStrokes.some((v) => v == null);
                 return (
-                  <button
-                    type="button"
+                  <div
                     key={r.id}
-                    onClick={() => {
-                      const next = applyPlayersFromRound(selectedCourse, r);
-                      setActiveRoundId(r.id);
-                      setPlayers(next);
-                      setError(null);
-                      schedulePersist(selectedCourse, selectedTeeId, next, r.id);
-                    }}
-                    className={`w-full rounded-xl border px-4 py-3 text-left transition ${
+                    className={`rounded-xl border px-4 py-3 transition ${
                       activeRoundId === r.id
                         ? "border-[var(--accent)]/50 bg-[var(--accent-soft)]"
-                        : "border-black/[0.08] bg-white hover:border-[var(--accent)]/35"
+                        : "border-black/[0.08] bg-white"
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-semibold text-[var(--text)]">
-                          {formatDateShort(r.updatedAtISO ?? r.createdAtISO)}
-                          {r.inProgress !== false &&
-                          r.holeScoresStrokes.some((v) => v == null) ? (
-                            <span className="ml-2 text-xs font-semibold text-[var(--warn)]">
-                              In progress
-                            </span>
-                          ) : null}
-                        </p>
-                        <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                          {r.teeName}
-                          {playerCount > 1 ? ` · ${playerCount} players` : ""}
-                        </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = applyPlayersFromRound(selectedCourse, r);
+                        setActiveRoundId(r.id);
+                        setPlayers(next);
+                        setError(null);
+                        schedulePersist(selectedCourse, selectedTeeId, next, r.id);
+                      }}
+                      className="w-full text-left"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-[var(--text)]">
+                            {formatDateShort(r.updatedAtISO ?? r.createdAtISO)}
+                            {inProgress ? (
+                              <span className="ml-2 text-xs font-semibold text-[var(--warn)]">
+                                In progress
+                              </span>
+                            ) : null}
+                          </p>
+                          <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                            {r.teeName}
+                            {playerCount > 1 ? ` · ${playerCount} players` : ""}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-[var(--text)]">
+                            {r.totalStrokes} / {r.totalPar}
+                          </p>
+                          <p className="mt-1 text-xs font-semibold text-[var(--accent)]">
+                            {scoreLabel} to par
+                            {playerCount > 1 ? " (You)" : ""}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-[var(--text)]">
-                          {r.totalStrokes} / {r.totalPar}
-                        </p>
-                        <p className="mt-1 text-xs font-semibold text-[var(--accent)]">
-                          {scoreLabel} to par
-                          {playerCount > 1 ? " (You)" : ""}
-                        </p>
-                      </div>
+                    </button>
+                    <div className="mt-2 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => deleteSavedRound(r.id)}
+                        className="rounded-lg px-2 py-1.5 text-xs font-semibold text-[var(--bad)] transition hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>

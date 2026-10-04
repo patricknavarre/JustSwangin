@@ -100,6 +100,15 @@ export function upsertRoundLocal(
   return saveRoundLocal(rest);
 }
 
+export function deleteRoundLocal(id: RoundId): boolean {
+  if (typeof window === "undefined") return false;
+  const existing = readAll();
+  const next = existing.filter((r) => r.id !== id);
+  if (next.length === existing.length) return false;
+  writeAll(next);
+  return true;
+}
+
 export function loadRoundsLocal(): SavedRound[] {
   return readAll();
 }
