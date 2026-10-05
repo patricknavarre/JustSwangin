@@ -91,6 +91,25 @@ export default function Home() {
       </div>
 
       <div className="card">
+        <h2 className="section-heading">Putt assist</h2>
+        <p className="font-display mt-2 text-2xl text-[var(--text)]">
+          Green slope and aim from your phone
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+          Lay the phone on the green, enter putt length, and get a live slope read plus an approximate
+          aim offset from Stimp—camera HUD for the sight picture, sensors for the tilt.
+        </p>
+        <div className="mt-5">
+          <NavLink
+            href="/putt-assist"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open putt assist
+          </NavLink>
+        </div>
+      </div>
+
+      <div className="card">
         <h2 className="section-heading">Privacy note</h2>
         <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
           Pose landmark processing happens on-device in the browser. The app sends your computed
@@ -160,8 +179,8 @@ export default function Home() {
           Build your friend-group favorites
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
-          Weekend utilities: range finder, club fitting, betting, club distances from launch-monitor
-          CSVs, and a lightweight strokes gained calculator.
+          Weekend utilities: range finder, putt assist, club fitting, betting, club distances from
+          launch-monitor CSVs, and a lightweight strokes gained calculator.
         </p>
 
         <div className="mt-5 space-y-3">
@@ -170,6 +189,12 @@ export default function Home() {
             className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
           >
             Open range finder
+          </NavLink>
+          <NavLink
+            href="/putt-assist"
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-2xl px-8 py-4 text-sm font-bold sm:w-auto"
+          >
+            Open putt assist
           </NavLink>
           <NavLink
             href="/club-fitting"

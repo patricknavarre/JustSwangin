@@ -49,6 +49,13 @@ export function SiteHeader() {
                 Range finder
               </NavLink>
               <NavLink
+                href="/putt-assist"
+                onClick={closeHeaderMenu}
+                className="rounded-xl px-3 py-2 text-sm font-semibold text-[var(--text)] transition hover:bg-[var(--pill-track)]"
+              >
+                Putt assist
+              </NavLink>
+              <NavLink
                 href="/club-fitting"
                 onClick={closeHeaderMenu}
                 className="rounded-xl px-3 py-2 text-sm font-semibold text-[var(--text)] transition hover:bg-[var(--pill-track)]"
