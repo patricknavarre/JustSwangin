@@ -4,7 +4,7 @@ import { PuttAssistClient } from "@/components/PuttAssistClient";
 export const metadata: Metadata = {
   title: "Putt assist — JustSwangin",
   description:
-    "Camera HUD with phone motion sensors to read green slope and estimate putt aim offset from distance and Stimp.",
+    "Live camera view of the cup with putt line overlay; phone on the ground reads slope and estimates aim from distance and Stimp.",
 };
 
 export default function PuttAssistPage() {

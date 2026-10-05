@@ -35,6 +35,58 @@ function percentFromDeg(deg: number): number {
 }
 
 /**
+ * Portrait phone on its bottom edge, rear camera toward the hole (sight-picture rig).
+ *
+ * - Bottom of phone on the ground near the ball; screen faces you, camera looks at the cup.
+ * - Putt line runs bottom → top of the view (+Y).
+ * - Side roll: gravity component on X (positive → break right).
+ * - Along line: gravity in the Y–Z plane (positive → uphill toward the hole).
+ */
+export function slopeFromGravityCameraRig(g: GravitySample): SlopeReading {
+  const mag = Math.hypot(g.x, g.y, g.z);
+  if (!Number.isFinite(mag) || mag < 1) {
+    return {
+      sideDeg: 0,
+      alongDeg: 0,
+      sidePercent: 0,
+      alongPercent: 0,
+      sideLabel: "flat",
+      alongLabel: "level",
+    };
+  }
+
+  const nx = g.x / mag;
+  const ny = g.y / mag;
+  const nz = g.z / mag;
+
+  let sideDeg = applyDeadzone(Math.atan2(nx, -ny) * DEG);
+  let alongDeg = applyDeadzone(Math.atan2(nz, -ny) * DEG);
+
+  sideDeg = clamp(sideDeg, -45, 45);
+  alongDeg = clamp(alongDeg, -45, 45);
+
+  const sidePercent = percentFromDeg(sideDeg);
+  const alongPercent = percentFromDeg(alongDeg);
+
+  let sideLabel: SideLabel = "flat";
+  if (sideDeg > 0) sideLabel = "right";
+  else if (sideDeg < 0) sideLabel = "left";
+
+  let alongLabel: AlongLabel = "level";
+  if (alongDeg > 0) alongLabel = "uphill";
+  else if (alongDeg < 0) alongLabel = "downhill";
+
+  return {
+    sideDeg,
+    alongDeg,
+    sidePercent,
+    alongPercent,
+    sideLabel,
+    alongLabel,
+  };
+}
+
+/**
  * Convert face-up device gravity into putt-line slope.
  *
  * Convention (portrait, face-up on green):

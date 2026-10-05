@@ -5,7 +5,7 @@ import { estimateAimOffset, formatAimCallout } from "@/lib/putt/aim";
 import {
   averageGravity,
   formatSlopeShort,
-  slopeFromGravity,
+  slopeFromGravityCameraRig,
   type GravitySample,
   type SlopeReading,
 } from "@/lib/putt/slope";
@@ -13,6 +13,11 @@ import {
 const FREEZE_WINDOW_MS = 800;
 const DEFAULT_DISTANCE_FT = 12;
 const DEFAULT_STIMP = 10;
+
+/** View overlay: cup near top, ball near bottom (phone bottom on ground). */
+const CUP_Y = 16;
+const BALL_Y = 90;
+const CENTER_X = 50;
 
 type MotionStatus = "idle" | "listening" | "denied" | "unsupported";
 
@@ -24,6 +29,15 @@ function needsMotionPermission(): boolean {
     }
   ).requestPermission;
   return typeof req === "function";
+}
+
+function aimOffsetPercent(aimInches: number, distanceFeet: number): number {
+  if (distanceFeet < 0.5) return 0;
+  const ft = Math.abs(aimInches) / 12;
+  const ratio = ft / distanceFeet;
+  const pct = ratio * 55;
+  const sign = aimInches >= 0 ? 1 : -1;
+  return sign * Math.min(22, Math.max(0, pct));
 }
 
 export function PuttAssistClient() {
@@ -57,7 +71,7 @@ export function PuttAssistClient() {
         }
       } catch {
         setCameraError(
-          "Camera access helps with the putt sight picture. Allow camera in your browser settings, or continue with slope-only.",
+          "Allow camera access to see the hole and overlay the putt line on the live view.",
         );
       }
     })();
@@ -97,7 +111,7 @@ export function PuttAssistClient() {
           freezeUntilRef.current = null;
           freezeBufRef.current = [];
           setFreezing(false);
-          if (avg) setFrozenReading(slopeFromGravity(avg));
+          if (avg) setFrozenReading(slopeFromGravityCameraRig(avg));
         }
         return;
       }
@@ -105,7 +119,7 @@ export function PuttAssistClient() {
       samplesRef.current.push(sample);
       if (samplesRef.current.length > 12) samplesRef.current.shift();
       const avg = averageGravity(samplesRef.current);
-      if (avg) setLiveReading(slopeFromGravity(avg));
+      if (avg) setLiveReading(slopeFromGravityCameraRig(avg));
     };
 
     window.addEventListener("devicemotion", onMotion);
@@ -151,13 +165,16 @@ export function PuttAssistClient() {
   const slopeText = displayReading ? formatSlopeShort(displayReading) : null;
   const aimText = aim ? formatAimCallout(aim) : null;
 
-  // Aim tick: map |offset| inches to px offset from center (cap ~72px).
-  const aimTickPx = useMemo(() => {
-    if (!aim || aim.aimLabel === "straight") return 0;
-    const sign = aim.offsetInches >= 0 ? 1 : -1;
-    const mag = Math.min(72, Math.abs(aim.offsetInches) * 3.5);
-    return sign * mag;
-  }, [aim]);
+  const aimX = useMemo(() => {
+    if (!aim) return CENTER_X;
+    return CENTER_X + aimOffsetPercent(aim.offsetInches, distanceFeet);
+  }, [aim, distanceFeet]);
+
+  const breakCurve = useMemo(() => {
+    const midY = (BALL_Y + CUP_Y) / 2;
+    const midX = CENTER_X + (aimX - CENTER_X) * 0.55;
+    return `M ${CENTER_X} ${BALL_Y} Q ${midX} ${midY} ${aimX} ${CUP_Y}`;
+  }, [aimX]);
 
   function startFreeze() {
     if (motionStatus !== "listening") return;
@@ -172,7 +189,7 @@ export function PuttAssistClient() {
       freezeUntilRef.current = null;
       freezeBufRef.current = [];
       setFreezing(false);
-      if (avg) setFrozenReading(slopeFromGravity(avg));
+      if (avg) setFrozenReading(slopeFromGravityCameraRig(avg));
     }, FREEZE_WINDOW_MS + 50);
   }
 
@@ -190,9 +207,9 @@ export function PuttAssistClient() {
           <p className="page-hero-eyebrow">Course tools</p>
           <h1 className="font-display page-hero-title">Putt assist</h1>
           <p className="page-hero-lede max-w-lg">
-            Lay your phone face-up on the green with the top toward the hole. Slope comes from motion
-            sensors; enter putt length for an approximate aim offset. Not LiDAR—confirm critical reads
-            with your eyes.
+            Rest the bottom of your phone on the ground behind the ball and point the camera at the
+            hole. The live view shows the cup with a putt line and aim overlay; slope comes from
+            motion sensors while the phone stays still.
           </p>
         </div>
       </div>
@@ -206,66 +223,105 @@ export function PuttAssistClient() {
           autoPlay
         />
 
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <svg width="220" height="280" viewBox="0 0 220 280" className="opacity-95" aria-hidden>
-            {/* Putt line */}
-            <line
-              x1="110"
-              y1="36"
-              x2="110"
-              y2="244"
-              stroke="rgba(255,255,255,0.55)"
-              strokeWidth="1.5"
-              strokeDasharray="4 5"
-            />
-            {/* Cup */}
-            <circle
-              cx="110"
-              cy="72"
-              r="14"
-              fill="none"
-              stroke="rgba(255,255,255,0.75)"
-              strokeWidth="1.75"
-            />
-            <circle cx="110" cy="72" r="3" className="fill-[var(--accent)]" />
-            {/* Ball start */}
-            <circle
-              cx="110"
-              cy="228"
-              r="7"
-              fill="none"
-              stroke="rgba(255,255,255,0.8)"
-              strokeWidth="1.5"
-            />
-            {/* Aim tick */}
-            {aim && Math.abs(aimTickPx) > 1 ? (
-              <g transform={`translate(${aimTickPx}, 0)`}>
-                <line
-                  x1="110"
-                  y1="52"
-                  x2="110"
-                  y2="92"
-                  stroke="rgba(250, 204, 21, 0.95)"
-                  strokeWidth="2.25"
-                />
-                <circle cx="110" cy="72" r="5" fill="rgba(250, 204, 21, 0.95)" />
-              </g>
-            ) : null}
-            {/* Side slope wedge hint */}
-            {displayReading && Math.abs(displayReading.sideDeg) >= 0.15 ? (
-              <path
-                d={
-                  displayReading.sideDeg > 0
-                    ? "M 110 160 L 150 190 L 110 190 Z"
-                    : "M 110 160 L 70 190 L 110 190 Z"
-                }
-                fill="rgba(255,255,255,0.18)"
-                stroke="rgba(255,255,255,0.45)"
-                strokeWidth="1"
-              />
-            ) : null}
-          </svg>
-        </div>
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden
+        >
+          <defs>
+            <linearGradient id="puttLineGlow" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stopColor="rgba(250,204,21,0.95)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.85)" />
+            </linearGradient>
+          </defs>
+
+          {/* Ground line at phone base */}
+          <line
+            x1="8"
+            y1={BALL_Y + 2}
+            x2="92"
+            y2={BALL_Y + 2}
+            stroke="rgba(255,255,255,0.35)"
+            strokeWidth="0.35"
+            vectorEffect="non-scaling-stroke"
+          />
+
+          {/* Putt path */}
+          <path
+            d={breakCurve}
+            fill="none"
+            stroke="url(#puttLineGlow)"
+            strokeWidth="0.55"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            strokeDasharray={aim && aim.aimLabel !== "straight" ? "1.2 0.8" : "none"}
+          />
+
+          {/* Center line to cup (subtle) */}
+          <line
+            x1={CENTER_X}
+            y1={BALL_Y}
+            x2={CENTER_X}
+            y2={CUP_Y}
+            stroke="rgba(255,255,255,0.22)"
+            strokeWidth="0.3"
+            vectorEffect="non-scaling-stroke"
+          />
+
+          {/* Aim point at hole */}
+          <circle
+            cx={aimX}
+            cy={CUP_Y}
+            r="2.2"
+            fill="rgba(250,204,21,0.95)"
+            stroke="rgba(0,0,0,0.35)"
+            strokeWidth="0.25"
+            vectorEffect="non-scaling-stroke"
+          />
+
+          {/* Cup ring */}
+          <circle
+            cx={CENTER_X}
+            cy={CUP_Y}
+            r="3.5"
+            fill="none"
+            stroke="rgba(255,255,255,0.9)"
+            strokeWidth="0.45"
+            vectorEffect="non-scaling-stroke"
+          />
+          <circle
+            cx={CENTER_X}
+            cy={CUP_Y}
+            r="0.8"
+            fill="rgba(255,255,255,0.95)"
+            vectorEffect="non-scaling-stroke"
+          />
+
+          {/* Ball */}
+          <circle
+            cx={CENTER_X}
+            cy={BALL_Y}
+            r="1.8"
+            fill="rgba(255,255,255,0.92)"
+            stroke="rgba(0,0,0,0.4)"
+            strokeWidth="0.3"
+            vectorEffect="non-scaling-stroke"
+          />
+
+          {displayReading && Math.abs(displayReading.sideDeg) >= 0.15 ? (
+            <text
+              x={displayReading.sideDeg > 0 ? 78 : 22}
+              y={48}
+              fill="rgba(255,255,255,0.75)"
+              fontSize="3.2"
+              textAnchor="middle"
+              className="font-sans font-semibold"
+            >
+              {displayReading.sideLabel === "flat" ? "" : displayReading.sideLabel.toUpperCase()}
+            </text>
+          ) : null}
+        </svg>
 
         <div className="pointer-events-none absolute left-0 right-0 top-0 bg-gradient-to-b from-black/60 to-transparent px-3 pb-10 pt-[max(0.75rem,env(safe-area-inset-top))] text-white">
           {cameraError ? (
@@ -286,13 +342,13 @@ export function PuttAssistClient() {
               ) : freezing ? (
                 <p className="text-[11px] uppercase tracking-wide text-white/80">Sampling…</p>
               ) : (
-                <p className="text-[11px] text-white/70">Live · hold still for a steadier freeze</p>
+                <p className="text-[11px] text-white/70">Live · keep phone still on the ground</p>
               )}
             </div>
           ) : (
             <p className="mt-1 text-sm text-white/90">
               {motionStatus === "listening"
-                ? "Place phone on the green — top toward the hole."
+                ? "Frame the cup at the top — bottom of phone on the ground at the ball."
                 : "Enable motion sensors to read slope."}
             </p>
           )}
@@ -300,7 +356,7 @@ export function PuttAssistClient() {
 
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-3 pb-3 pt-12">
           <p className="text-center text-[11px] text-white/75">
-            Face-up · top of phone toward hole · enter distance below
+            Yellow dot = aim · white ring = cup · line from ball
           </p>
         </div>
       </div>
@@ -309,8 +365,8 @@ export function PuttAssistClient() {
         <div>
           <h2 className="section-heading">Putt setup</h2>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Distance is manual. Aim offset is an approximate model from sidehill and Stimp—not a
-            guarantee.
+            Stand the phone on its bottom edge behind the ball, tilt until the cup is centered in
+            view, then enter distance. Aim offset is approximate—trust your read on must-makes.
           </p>
         </div>
 

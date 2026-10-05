@@ -96,8 +96,8 @@ export default function Home() {
           Green slope and aim from your phone
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
-          Lay the phone on the green, enter putt length, and get a live slope read plus an approximate
-          aim offset from Stimp—camera HUD for the sight picture, sensors for the tilt.
+          Stand the phone on its bottom edge behind the ball, frame the hole in the camera, and see
+          the putt line with an approximate aim point from slope and Stimp.
         </p>
         <div className="mt-5">
           <NavLink
